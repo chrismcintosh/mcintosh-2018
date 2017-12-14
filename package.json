@@ -1,0 +1,33 @@
+{
+  "name": "mcintosh",
+  "version": "1.0.0",
+  "description": "[![Build Status](https://travis-ci.org/Automattic/_s.svg?branch=master)](https://travis-ci.org/Automattic/_s)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrismcintosh/mcintosh-2018.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chrismcintosh/mcintosh-2018/issues"
+  },
+  "homepage": "https://github.com/chrismcintosh/mcintosh-2018#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "beepbeep": "^1.2.1",
+    "browsersync": "0.0.1-security",
+    "eslint": "^4.13.1",
+    "fs": "0.0.1-security",
+    "js-yaml": "^3.10.0",
+    "path": "^0.12.7",
+    "webpack": "^3.10.0",
+    "webpack-stream": "^4.0.0"
+  }
+}
