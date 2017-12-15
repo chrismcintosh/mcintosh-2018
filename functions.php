@@ -112,7 +112,8 @@ add_action( 'widgets_init', 'mcintosh_widgets_init' );
 function mcintosh_scripts() {
 	wp_enqueue_style( 'mcintosh-style', get_stylesheet_uri() );
 
-	wp_enqueue_script( 'mcintosh-navigation', get_template_directory_uri() . '/assets/js/default/navigation.js', array(), '20151215', true );
+	wp_enqueue_script( 'mcintosh-navigation', get_template_directory_uri() . '/bundle.js', array('jquery'), 1, false );
+	
 
 	wp_enqueue_script( 'mcintosh-skip-link-focus-fix', get_template_directory_uri() . '/assets/js/default/skip-link-focus-fix.js', array(), '20151215', true );
 
@@ -155,3 +156,5 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 if ( class_exists( 'WooCommerce' ) ) {
 	require get_template_directory() . '/lib/inc/woocommerce.php';
 }
+
+include get_stylesheet_directory() . '/lib/inc/foundation-walker.php';

@@ -58,7 +58,7 @@ function sass() {
 // In production, the file is minified
 function javascript() {
   return gulp
-    .src(PATHS.entries)
+    .src(PATHS.es6js)
     .pipe(named())
     .pipe($.sourcemaps.init())
     .pipe(webpackStream(myWebpackConfig, webpack))
@@ -71,7 +71,7 @@ function javascript() {
       )
     )
     .pipe($.if(!PRODUCTION, $.sourcemaps.write()))
-    .pipe(gulp.dest(PATHS.dist))
+    .pipe(gulp.dest(PATHS.root))
 }
 
 // Start a server with BrowserSync to preview the site in
