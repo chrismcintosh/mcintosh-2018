@@ -6,10 +6,15 @@
   grid-template-columns: 1fr 1fr;
   max-width: 1024px;
   margin: 0 auto;
+  align-items: center;
 }
 
 .custom-logo {
   max-width: 300px;
   max-height: 300px;
   width: auto;
+}
+
+#primary-menu {
+  justify-content: flex-end;
 }
