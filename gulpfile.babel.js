@@ -6,27 +6,35 @@ import browser from "browser-sync"
 import gulp from "gulp"
 import yaml from "js-yaml"
 import fs from "fs"
-import named from "vinyl-named"
 import webpackStream from "webpack-stream"
-import webpack from "webpack"
-import myWebpackConfig from "./webpack/webpack.config.js"
+import webpack2 from "webpack"
+import named from "vinyl-named"
+import myWebpackConfig from "./webpack.config.js"
 
-// Load all gulp plugins in to one variable
+// Load all Gulp plugins into one variable
 const $ = plugins()
 
 // Check for --production flag
-const PRODUCTION = !!yargs.argv.PRODUCTION
+const PRODUCTION = !!yargs.argv.production
 
-// Load Settings from config.yml
-const { COMPATIBILITY, PROXY, PORT, PATHS } = loadConfig()
+// Load settings from settings.yml
+const { COMPATIBILITY, PROXY, PORT, UNCSS_OPTIONS, PATHS } = loadConfig()
+
 function loadConfig() {
   let ymlFile = fs.readFileSync("config.yml", "utf8")
   return yaml.load(ymlFile)
 }
 
+// Build the site, run the server, and watch for file changes
 gulp.task("default", gulp.series(server, watch))
 
-gulp.task("prod", gulp.series(gulp.parallel(sass, javascript)))
+gulp.task("build", gulp.series(gulp.parallel(sass, javascript)))
+
+// Delete the "dist" folder
+// This happens every time a build starts
+// function clean(done) {
+//   rimraf(PATHS.dist, done);
+// }
 
 // Compile Sass into CSS
 // In production, the CSS is compressed
@@ -49,7 +57,7 @@ function sass() {
       //.pipe($.if(PRODUCTION, $.uncss(UNCSS_OPTIONS)))
       .pipe($.if(PRODUCTION, $.cleanCss({ compatibility: "ie9" })))
       .pipe($.if(!PRODUCTION, $.sourcemaps.write()))
-      .pipe(gulp.dest(PATHS.root))
+      .pipe(gulp.dest(PATHS.dist))
       .pipe(browser.reload({ stream: true }))
   )
 }
@@ -58,10 +66,10 @@ function sass() {
 // In production, the file is minified
 function javascript() {
   return gulp
-    .src(PATHS.es6js)
+    .src(PATHS.entries)
     .pipe(named())
     .pipe($.sourcemaps.init())
-    .pipe(webpackStream(myWebpackConfig, webpack))
+    .pipe(webpackStream(myWebpackConfig, webpack2))
     .pipe(
       $.if(
         PRODUCTION,
@@ -71,7 +79,23 @@ function javascript() {
       )
     )
     .pipe($.if(!PRODUCTION, $.sourcemaps.write()))
-    .pipe(gulp.dest(PATHS.root))
+    .pipe(gulp.dest(PATHS.dist))
+}
+
+// Copy images to the "dist" folder
+// In production, the images are compressed
+function images() {
+  return gulp
+    .src("/assets/img/**/*")
+    .pipe(
+      $.if(
+        PRODUCTION,
+        $.imagemin({
+          progressive: true
+        })
+      )
+    )
+    .pipe(gulp.dest("/assets/imgmin/"))
 }
 
 // Start a server with BrowserSync to preview the site in
@@ -96,5 +120,5 @@ function watch() {
   gulp
     .watch("assets/js/**/*.js")
     .on("all", gulp.series(javascript, browser.reload))
-  //   gulp.watch("assets/img/**/*").on("all", gulp.series(images, browser.reload))
+  gulp.watch("assets/img/**/*").on("all", gulp.series(images, browser.reload))
 }

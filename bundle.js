@@ -33,6 +33,9 @@
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -60,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -140,6 +143,92 @@ exports.transitionend = transitionend;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Plugin = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _foundationUtil = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// Abstract class for providing lifecycle hooks. Expect plugins to define AT LEAST
+// {function} _setup (replaces previous constructor),
+// {function} _destroy (replaces previous destroy)
+var Plugin = function () {
+  function Plugin(element, options) {
+    _classCallCheck(this, Plugin);
+
+    this._setup(element, options);
+    var pluginName = getPluginName(this);
+    this.uuid = (0, _foundationUtil.GetYoDigits)(6, pluginName);
+
+    if (!this.$element.attr('data-' + pluginName)) {
+      this.$element.attr('data-' + pluginName, this.uuid);
+    }
+    if (!this.$element.data('zfPlugin')) {
+      this.$element.data('zfPlugin', this);
+    }
+    /**
+     * Fires when the plugin has initialized.
+     * @event Plugin#init
+     */
+    this.$element.trigger('init.zf.' + pluginName);
+  }
+
+  _createClass(Plugin, [{
+    key: 'destroy',
+    value: function destroy() {
+      this._destroy();
+      var pluginName = getPluginName(this);
+      this.$element.removeAttr('data-' + pluginName).removeData('zfPlugin')
+      /**
+       * Fires when the plugin has been destroyed.
+       * @event Plugin#destroyed
+       */
+      .trigger('destroyed.zf.' + pluginName);
+      for (var prop in this) {
+        this[prop] = null; //clean up script to prep for garbage collection.
+      }
+    }
+  }]);
+
+  return Plugin;
+}();
+
+// Convert PascalCase to kebab-case
+// Thank you: http://stackoverflow.com/a/8955580
+
+
+function hyphenate(str) {
+  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+}
+
+function getPluginName(obj) {
+  if (typeof obj.constructor.name !== 'undefined') {
+    return hyphenate(obj.constructor.name);
+  } else {
+    return hyphenate(obj.className);
+  }
+}
+
+exports.Plugin = Plugin;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -324,92 +413,6 @@ function getKeyCodes(kcs) {
 }
 
 exports.Keyboard = Keyboard;
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Plugin = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _foundationUtil = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// Abstract class for providing lifecycle hooks. Expect plugins to define AT LEAST
-// {function} _setup (replaces previous constructor),
-// {function} _destroy (replaces previous destroy)
-var Plugin = function () {
-  function Plugin(element, options) {
-    _classCallCheck(this, Plugin);
-
-    this._setup(element, options);
-    var pluginName = getPluginName(this);
-    this.uuid = (0, _foundationUtil.GetYoDigits)(6, pluginName);
-
-    if (!this.$element.attr('data-' + pluginName)) {
-      this.$element.attr('data-' + pluginName, this.uuid);
-    }
-    if (!this.$element.data('zfPlugin')) {
-      this.$element.data('zfPlugin', this);
-    }
-    /**
-     * Fires when the plugin has initialized.
-     * @event Plugin#init
-     */
-    this.$element.trigger('init.zf.' + pluginName);
-  }
-
-  _createClass(Plugin, [{
-    key: 'destroy',
-    value: function destroy() {
-      this._destroy();
-      var pluginName = getPluginName(this);
-      this.$element.removeAttr('data-' + pluginName).removeData('zfPlugin')
-      /**
-       * Fires when the plugin has been destroyed.
-       * @event Plugin#destroyed
-       */
-      .trigger('destroyed.zf.' + pluginName);
-      for (var prop in this) {
-        this[prop] = null; //clean up script to prep for garbage collection.
-      }
-    }
-  }]);
-
-  return Plugin;
-}();
-
-// Convert PascalCase to kebab-case
-// Thank you: http://stackoverflow.com/a/8955580
-
-
-function hyphenate(str) {
-  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-}
-
-function getPluginName(obj) {
-  if (typeof obj.constructor.name !== 'undefined') {
-    return hyphenate(obj.constructor.name);
-  } else {
-    return hyphenate(obj.className);
-  }
-}
-
-exports.Plugin = Plugin;
 
 /***/ }),
 /* 4 */
@@ -750,292 +753,6 @@ exports.Nest = Nest;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Triggers = undefined;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _foundationUtil = __webpack_require__(15);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var MutationObserver = function () {
-  var prefixes = ['WebKit', 'Moz', 'O', 'Ms', ''];
-  for (var i = 0; i < prefixes.length; i++) {
-    if (prefixes[i] + 'MutationObserver' in window) {
-      return window[prefixes[i] + 'MutationObserver'];
-    }
-  }
-  return false;
-}();
-
-var triggers = function triggers(el, type) {
-  el.data(type).split(' ').forEach(function (id) {
-    (0, _jquery2.default)('#' + id)[type === 'close' ? 'trigger' : 'triggerHandler'](type + '.zf.trigger', [el]);
-  });
-};
-
-var Triggers = {
-  Listeners: {
-    Basic: {},
-    Global: {}
-  },
-  Initializers: {}
-};
-
-Triggers.Listeners.Basic = {
-  openListener: function openListener() {
-    triggers((0, _jquery2.default)(this), 'open');
-  },
-  closeListener: function closeListener() {
-    var id = (0, _jquery2.default)(this).data('close');
-    if (id) {
-      triggers((0, _jquery2.default)(this), 'close');
-    } else {
-      (0, _jquery2.default)(this).trigger('close.zf.trigger');
-    }
-  },
-  toggleListener: function toggleListener() {
-    var id = (0, _jquery2.default)(this).data('toggle');
-    if (id) {
-      triggers((0, _jquery2.default)(this), 'toggle');
-    } else {
-      (0, _jquery2.default)(this).trigger('toggle.zf.trigger');
-    }
-  },
-  closeableListener: function closeableListener(e) {
-    e.stopPropagation();
-    var animation = (0, _jquery2.default)(this).data('closable');
-
-    if (animation !== '') {
-      _foundationUtil.Motion.animateOut((0, _jquery2.default)(this), animation, function () {
-        (0, _jquery2.default)(this).trigger('closed.zf');
-      });
-    } else {
-      (0, _jquery2.default)(this).fadeOut().trigger('closed.zf');
-    }
-  },
-  toggleFocusListener: function toggleFocusListener() {
-    var id = (0, _jquery2.default)(this).data('toggle-focus');
-    (0, _jquery2.default)('#' + id).triggerHandler('toggle.zf.trigger', [(0, _jquery2.default)(this)]);
-  }
-};
-
-// Elements with [data-open] will reveal a plugin that supports it when clicked.
-Triggers.Initializers.addOpenListener = function ($elem) {
-  $elem.off('click.zf.trigger', Triggers.Listeners.Basic.openListener);
-  $elem.on('click.zf.trigger', '[data-open]', Triggers.Listeners.Basic.openListener);
-};
-
-// Elements with [data-close] will close a plugin that supports it when clicked.
-// If used without a value on [data-close], the event will bubble, allowing it to close a parent component.
-Triggers.Initializers.addCloseListener = function ($elem) {
-  $elem.off('click.zf.trigger', Triggers.Listeners.Basic.closeListener);
-  $elem.on('click.zf.trigger', '[data-close]', Triggers.Listeners.Basic.closeListener);
-};
-
-// Elements with [data-toggle] will toggle a plugin that supports it when clicked.
-Triggers.Initializers.addToggleListener = function ($elem) {
-  $elem.off('click.zf.trigger', Triggers.Listeners.Basic.toggleListener);
-  $elem.on('click.zf.trigger', '[data-toggle]', Triggers.Listeners.Basic.toggleListener);
-};
-
-// Elements with [data-closable] will respond to close.zf.trigger events.
-Triggers.Initializers.addCloseableListener = function ($elem) {
-  $elem.off('close.zf.trigger', Triggers.Listeners.Basic.closeableListener);
-  $elem.on('close.zf.trigger', '[data-closeable], [data-closable]', Triggers.Listeners.Basic.closeableListener);
-};
-
-// Elements with [data-toggle-focus] will respond to coming in and out of focus
-Triggers.Initializers.addToggleFocusListener = function ($elem) {
-  $elem.off('focus.zf.trigger blur.zf.trigger', Triggers.Listeners.Basic.toggleFocusListener);
-  $elem.on('focus.zf.trigger blur.zf.trigger', '[data-toggle-focus]', Triggers.Listeners.Basic.toggleFocusListener);
-};
-
-// More Global/complex listeners and triggers
-Triggers.Listeners.Global = {
-  resizeListener: function resizeListener($nodes) {
-    if (!MutationObserver) {
-      //fallback for IE 9
-      $nodes.each(function () {
-        (0, _jquery2.default)(this).triggerHandler('resizeme.zf.trigger');
-      });
-    }
-    //trigger all listening elements and signal a resize event
-    $nodes.attr('data-events', "resize");
-  },
-  scrollListener: function scrollListener($nodes) {
-    if (!MutationObserver) {
-      //fallback for IE 9
-      $nodes.each(function () {
-        (0, _jquery2.default)(this).triggerHandler('scrollme.zf.trigger');
-      });
-    }
-    //trigger all listening elements and signal a scroll event
-    $nodes.attr('data-events', "scroll");
-  },
-  closeMeListener: function closeMeListener(e, pluginId) {
-    var plugin = e.namespace.split('.')[0];
-    var plugins = (0, _jquery2.default)('[data-' + plugin + ']').not('[data-yeti-box="' + pluginId + '"]');
-
-    plugins.each(function () {
-      var _this = (0, _jquery2.default)(this);
-      _this.triggerHandler('close.zf.trigger', [_this]);
-    });
-  }
-
-  // Global, parses whole document.
-};Triggers.Initializers.addClosemeListener = function (pluginName) {
-  var yetiBoxes = (0, _jquery2.default)('[data-yeti-box]'),
-      plugNames = ['dropdown', 'tooltip', 'reveal'];
-
-  if (pluginName) {
-    if (typeof pluginName === 'string') {
-      plugNames.push(pluginName);
-    } else if ((typeof pluginName === 'undefined' ? 'undefined' : _typeof(pluginName)) === 'object' && typeof pluginName[0] === 'string') {
-      plugNames.concat(pluginName);
-    } else {
-      console.error('Plugin names must be strings');
-    }
-  }
-  if (yetiBoxes.length) {
-    var listeners = plugNames.map(function (name) {
-      return 'closeme.zf.' + name;
-    }).join(' ');
-
-    (0, _jquery2.default)(window).off(listeners).on(listeners, Triggers.Listeners.Global.closeMeListener);
-  }
-};
-
-function debounceGlobalListener(debounce, trigger, listener) {
-  var timer = void 0,
-      args = Array.prototype.slice.call(arguments, 3);
-  (0, _jquery2.default)(window).off(trigger).on(trigger, function (e) {
-    if (timer) {
-      clearTimeout(timer);
-    }
-    timer = setTimeout(function () {
-      listener.apply(null, args);
-    }, debounce || 10); //default time to emit scroll event
-  });
-}
-
-Triggers.Initializers.addResizeListener = function (debounce) {
-  var $nodes = (0, _jquery2.default)('[data-resize]');
-  if ($nodes.length) {
-    debounceGlobalListener(debounce, 'resize.zf.trigger', Triggers.Listeners.Global.resizeListener, $nodes);
-  }
-};
-
-Triggers.Initializers.addScrollListener = function (debounce) {
-  var $nodes = (0, _jquery2.default)('[data-scroll]');
-  if ($nodes.length) {
-    debounceGlobalListener(debounce, 'scroll.zf.trigger', Triggers.Listeners.Global.scrollListener, $nodes);
-  }
-};
-
-Triggers.Initializers.addMutationEventsListener = function ($elem) {
-  if (!MutationObserver) {
-    return false;
-  }
-  var $nodes = $elem.find('[data-resize], [data-scroll], [data-mutate]');
-
-  //element callback
-  var listeningElementsMutation = function listeningElementsMutation(mutationRecordsList) {
-    var $target = (0, _jquery2.default)(mutationRecordsList[0].target);
-
-    //trigger the event handler for the element depending on type
-    switch (mutationRecordsList[0].type) {
-      case "attributes":
-        if ($target.attr("data-events") === "scroll" && mutationRecordsList[0].attributeName === "data-events") {
-          $target.triggerHandler('scrollme.zf.trigger', [$target, window.pageYOffset]);
-        }
-        if ($target.attr("data-events") === "resize" && mutationRecordsList[0].attributeName === "data-events") {
-          $target.triggerHandler('resizeme.zf.trigger', [$target]);
-        }
-        if (mutationRecordsList[0].attributeName === "style") {
-          $target.closest("[data-mutate]").attr("data-events", "mutate");
-          $target.closest("[data-mutate]").triggerHandler('mutateme.zf.trigger', [$target.closest("[data-mutate]")]);
-        }
-        break;
-
-      case "childList":
-        $target.closest("[data-mutate]").attr("data-events", "mutate");
-        $target.closest("[data-mutate]").triggerHandler('mutateme.zf.trigger', [$target.closest("[data-mutate]")]);
-        break;
-
-      default:
-        return false;
-      //nothing
-    }
-  };
-
-  if ($nodes.length) {
-    //for each element that needs to listen for resizing, scrolling, or mutation add a single observer
-    for (var i = 0; i <= $nodes.length - 1; i++) {
-      var elementObserver = new MutationObserver(listeningElementsMutation);
-      elementObserver.observe($nodes[i], { attributes: true, childList: true, characterData: false, subtree: true, attributeFilter: ["data-events", "style"] });
-    }
-  }
-};
-
-Triggers.Initializers.addSimpleListeners = function () {
-  var $document = (0, _jquery2.default)(document);
-
-  Triggers.Initializers.addOpenListener($document);
-  Triggers.Initializers.addCloseListener($document);
-  Triggers.Initializers.addToggleListener($document);
-  Triggers.Initializers.addCloseableListener($document);
-  Triggers.Initializers.addToggleFocusListener($document);
-};
-
-Triggers.Initializers.addGlobalListeners = function () {
-  var $document = (0, _jquery2.default)(document);
-  Triggers.Initializers.addMutationEventsListener($document);
-  Triggers.Initializers.addResizeListener();
-  Triggers.Initializers.addScrollListener();
-  Triggers.Initializers.addClosemeListener();
-};
-
-Triggers.init = function ($, Foundation) {
-  if (typeof $.triggersInitialized === 'undefined') {
-    var $document = $(document);
-
-    if (document.readyState === "complete") {
-      Triggers.Initializers.addSimpleListeners();
-      Triggers.Initializers.addGlobalListeners();
-    } else {
-      $(window).on('load', function () {
-        Triggers.Initializers.addSimpleListeners();
-        Triggers.Initializers.addGlobalListeners();
-      });
-    }
-
-    $.triggersInitialized = true;
-  }
-
-  if (Foundation) {
-    Foundation.Triggers = Triggers;
-    // Legacy included to be backwards compatible for now.
-    Foundation.IHearYou = Triggers.Initializers.addGlobalListeners;
-  }
-};
-
-exports.Triggers = Triggers;
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.AccordionMenu = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1044,13 +761,13 @@ var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _foundationUtil = __webpack_require__(2);
+var _foundationUtil = __webpack_require__(3);
 
 var _foundationUtil2 = __webpack_require__(5);
 
 var _foundationUtil3 = __webpack_require__(1);
 
-var _foundation = __webpack_require__(3);
+var _foundation = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1432,7 +1149,7 @@ AccordionMenu.defaults = {
 exports.AccordionMenu = AccordionMenu;
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1449,15 +1166,15 @@ var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _foundationUtil = __webpack_require__(2);
+var _foundationUtil = __webpack_require__(3);
 
 var _foundationUtil2 = __webpack_require__(5);
 
-var _foundationUtil3 = __webpack_require__(9);
+var _foundationUtil3 = __webpack_require__(8);
 
 var _foundationUtil4 = __webpack_require__(1);
 
-var _foundation = __webpack_require__(3);
+var _foundation = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1966,7 +1683,7 @@ DropdownMenu.defaults = {
 exports.DropdownMenu = DropdownMenu;
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2202,6 +1919,292 @@ function GetExplicitOffsets(element, anchor, position, alignment, vOffset, hOffs
 exports.Box = Box;
 
 /***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Triggers = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _foundationUtil = __webpack_require__(17);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MutationObserver = function () {
+  var prefixes = ['WebKit', 'Moz', 'O', 'Ms', ''];
+  for (var i = 0; i < prefixes.length; i++) {
+    if (prefixes[i] + 'MutationObserver' in window) {
+      return window[prefixes[i] + 'MutationObserver'];
+    }
+  }
+  return false;
+}();
+
+var triggers = function triggers(el, type) {
+  el.data(type).split(' ').forEach(function (id) {
+    (0, _jquery2.default)('#' + id)[type === 'close' ? 'trigger' : 'triggerHandler'](type + '.zf.trigger', [el]);
+  });
+};
+
+var Triggers = {
+  Listeners: {
+    Basic: {},
+    Global: {}
+  },
+  Initializers: {}
+};
+
+Triggers.Listeners.Basic = {
+  openListener: function openListener() {
+    triggers((0, _jquery2.default)(this), 'open');
+  },
+  closeListener: function closeListener() {
+    var id = (0, _jquery2.default)(this).data('close');
+    if (id) {
+      triggers((0, _jquery2.default)(this), 'close');
+    } else {
+      (0, _jquery2.default)(this).trigger('close.zf.trigger');
+    }
+  },
+  toggleListener: function toggleListener() {
+    var id = (0, _jquery2.default)(this).data('toggle');
+    if (id) {
+      triggers((0, _jquery2.default)(this), 'toggle');
+    } else {
+      (0, _jquery2.default)(this).trigger('toggle.zf.trigger');
+    }
+  },
+  closeableListener: function closeableListener(e) {
+    e.stopPropagation();
+    var animation = (0, _jquery2.default)(this).data('closable');
+
+    if (animation !== '') {
+      _foundationUtil.Motion.animateOut((0, _jquery2.default)(this), animation, function () {
+        (0, _jquery2.default)(this).trigger('closed.zf');
+      });
+    } else {
+      (0, _jquery2.default)(this).fadeOut().trigger('closed.zf');
+    }
+  },
+  toggleFocusListener: function toggleFocusListener() {
+    var id = (0, _jquery2.default)(this).data('toggle-focus');
+    (0, _jquery2.default)('#' + id).triggerHandler('toggle.zf.trigger', [(0, _jquery2.default)(this)]);
+  }
+};
+
+// Elements with [data-open] will reveal a plugin that supports it when clicked.
+Triggers.Initializers.addOpenListener = function ($elem) {
+  $elem.off('click.zf.trigger', Triggers.Listeners.Basic.openListener);
+  $elem.on('click.zf.trigger', '[data-open]', Triggers.Listeners.Basic.openListener);
+};
+
+// Elements with [data-close] will close a plugin that supports it when clicked.
+// If used without a value on [data-close], the event will bubble, allowing it to close a parent component.
+Triggers.Initializers.addCloseListener = function ($elem) {
+  $elem.off('click.zf.trigger', Triggers.Listeners.Basic.closeListener);
+  $elem.on('click.zf.trigger', '[data-close]', Triggers.Listeners.Basic.closeListener);
+};
+
+// Elements with [data-toggle] will toggle a plugin that supports it when clicked.
+Triggers.Initializers.addToggleListener = function ($elem) {
+  $elem.off('click.zf.trigger', Triggers.Listeners.Basic.toggleListener);
+  $elem.on('click.zf.trigger', '[data-toggle]', Triggers.Listeners.Basic.toggleListener);
+};
+
+// Elements with [data-closable] will respond to close.zf.trigger events.
+Triggers.Initializers.addCloseableListener = function ($elem) {
+  $elem.off('close.zf.trigger', Triggers.Listeners.Basic.closeableListener);
+  $elem.on('close.zf.trigger', '[data-closeable], [data-closable]', Triggers.Listeners.Basic.closeableListener);
+};
+
+// Elements with [data-toggle-focus] will respond to coming in and out of focus
+Triggers.Initializers.addToggleFocusListener = function ($elem) {
+  $elem.off('focus.zf.trigger blur.zf.trigger', Triggers.Listeners.Basic.toggleFocusListener);
+  $elem.on('focus.zf.trigger blur.zf.trigger', '[data-toggle-focus]', Triggers.Listeners.Basic.toggleFocusListener);
+};
+
+// More Global/complex listeners and triggers
+Triggers.Listeners.Global = {
+  resizeListener: function resizeListener($nodes) {
+    if (!MutationObserver) {
+      //fallback for IE 9
+      $nodes.each(function () {
+        (0, _jquery2.default)(this).triggerHandler('resizeme.zf.trigger');
+      });
+    }
+    //trigger all listening elements and signal a resize event
+    $nodes.attr('data-events', "resize");
+  },
+  scrollListener: function scrollListener($nodes) {
+    if (!MutationObserver) {
+      //fallback for IE 9
+      $nodes.each(function () {
+        (0, _jquery2.default)(this).triggerHandler('scrollme.zf.trigger');
+      });
+    }
+    //trigger all listening elements and signal a scroll event
+    $nodes.attr('data-events', "scroll");
+  },
+  closeMeListener: function closeMeListener(e, pluginId) {
+    var plugin = e.namespace.split('.')[0];
+    var plugins = (0, _jquery2.default)('[data-' + plugin + ']').not('[data-yeti-box="' + pluginId + '"]');
+
+    plugins.each(function () {
+      var _this = (0, _jquery2.default)(this);
+      _this.triggerHandler('close.zf.trigger', [_this]);
+    });
+  }
+
+  // Global, parses whole document.
+};Triggers.Initializers.addClosemeListener = function (pluginName) {
+  var yetiBoxes = (0, _jquery2.default)('[data-yeti-box]'),
+      plugNames = ['dropdown', 'tooltip', 'reveal'];
+
+  if (pluginName) {
+    if (typeof pluginName === 'string') {
+      plugNames.push(pluginName);
+    } else if ((typeof pluginName === 'undefined' ? 'undefined' : _typeof(pluginName)) === 'object' && typeof pluginName[0] === 'string') {
+      plugNames.concat(pluginName);
+    } else {
+      console.error('Plugin names must be strings');
+    }
+  }
+  if (yetiBoxes.length) {
+    var listeners = plugNames.map(function (name) {
+      return 'closeme.zf.' + name;
+    }).join(' ');
+
+    (0, _jquery2.default)(window).off(listeners).on(listeners, Triggers.Listeners.Global.closeMeListener);
+  }
+};
+
+function debounceGlobalListener(debounce, trigger, listener) {
+  var timer = void 0,
+      args = Array.prototype.slice.call(arguments, 3);
+  (0, _jquery2.default)(window).off(trigger).on(trigger, function (e) {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(function () {
+      listener.apply(null, args);
+    }, debounce || 10); //default time to emit scroll event
+  });
+}
+
+Triggers.Initializers.addResizeListener = function (debounce) {
+  var $nodes = (0, _jquery2.default)('[data-resize]');
+  if ($nodes.length) {
+    debounceGlobalListener(debounce, 'resize.zf.trigger', Triggers.Listeners.Global.resizeListener, $nodes);
+  }
+};
+
+Triggers.Initializers.addScrollListener = function (debounce) {
+  var $nodes = (0, _jquery2.default)('[data-scroll]');
+  if ($nodes.length) {
+    debounceGlobalListener(debounce, 'scroll.zf.trigger', Triggers.Listeners.Global.scrollListener, $nodes);
+  }
+};
+
+Triggers.Initializers.addMutationEventsListener = function ($elem) {
+  if (!MutationObserver) {
+    return false;
+  }
+  var $nodes = $elem.find('[data-resize], [data-scroll], [data-mutate]');
+
+  //element callback
+  var listeningElementsMutation = function listeningElementsMutation(mutationRecordsList) {
+    var $target = (0, _jquery2.default)(mutationRecordsList[0].target);
+
+    //trigger the event handler for the element depending on type
+    switch (mutationRecordsList[0].type) {
+      case "attributes":
+        if ($target.attr("data-events") === "scroll" && mutationRecordsList[0].attributeName === "data-events") {
+          $target.triggerHandler('scrollme.zf.trigger', [$target, window.pageYOffset]);
+        }
+        if ($target.attr("data-events") === "resize" && mutationRecordsList[0].attributeName === "data-events") {
+          $target.triggerHandler('resizeme.zf.trigger', [$target]);
+        }
+        if (mutationRecordsList[0].attributeName === "style") {
+          $target.closest("[data-mutate]").attr("data-events", "mutate");
+          $target.closest("[data-mutate]").triggerHandler('mutateme.zf.trigger', [$target.closest("[data-mutate]")]);
+        }
+        break;
+
+      case "childList":
+        $target.closest("[data-mutate]").attr("data-events", "mutate");
+        $target.closest("[data-mutate]").triggerHandler('mutateme.zf.trigger', [$target.closest("[data-mutate]")]);
+        break;
+
+      default:
+        return false;
+      //nothing
+    }
+  };
+
+  if ($nodes.length) {
+    //for each element that needs to listen for resizing, scrolling, or mutation add a single observer
+    for (var i = 0; i <= $nodes.length - 1; i++) {
+      var elementObserver = new MutationObserver(listeningElementsMutation);
+      elementObserver.observe($nodes[i], { attributes: true, childList: true, characterData: false, subtree: true, attributeFilter: ["data-events", "style"] });
+    }
+  }
+};
+
+Triggers.Initializers.addSimpleListeners = function () {
+  var $document = (0, _jquery2.default)(document);
+
+  Triggers.Initializers.addOpenListener($document);
+  Triggers.Initializers.addCloseListener($document);
+  Triggers.Initializers.addToggleListener($document);
+  Triggers.Initializers.addCloseableListener($document);
+  Triggers.Initializers.addToggleFocusListener($document);
+};
+
+Triggers.Initializers.addGlobalListeners = function () {
+  var $document = (0, _jquery2.default)(document);
+  Triggers.Initializers.addMutationEventsListener($document);
+  Triggers.Initializers.addResizeListener();
+  Triggers.Initializers.addScrollListener();
+  Triggers.Initializers.addClosemeListener();
+};
+
+Triggers.init = function ($, Foundation) {
+  if (typeof $.triggersInitialized === 'undefined') {
+    var $document = $(document);
+
+    if (document.readyState === "complete") {
+      Triggers.Initializers.addSimpleListeners();
+      Triggers.Initializers.addGlobalListeners();
+    } else {
+      $(window).on('load', function () {
+        Triggers.Initializers.addSimpleListeners();
+        Triggers.Initializers.addGlobalListeners();
+      });
+    }
+
+    $.triggersInitialized = true;
+  }
+
+  if (Foundation) {
+    Foundation.Triggers = Triggers;
+    // Legacy included to be backwards compatible for now.
+    Foundation.IHearYou = Triggers.Initializers.addGlobalListeners;
+  }
+};
+
+exports.Triggers = Triggers;
+
+/***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2212,15 +2215,39 @@ var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _whatInput = __webpack_require__(11);
+var _foundation = __webpack_require__(13);
 
-var _whatInput2 = _interopRequireDefault(_whatInput);
+var _foundationUtil = __webpack_require__(3);
 
-__webpack_require__(12);
+var _foundationUtil2 = __webpack_require__(18);
+
+var _foundationUtil3 = __webpack_require__(9);
+
+var _foundation2 = __webpack_require__(6);
+
+var _foundation3 = __webpack_require__(7);
+
+var _foundation4 = __webpack_require__(15);
+
+var _foundation5 = __webpack_require__(16);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-(0, _jquery2.default)(document).foundation();
+_foundation.Foundation.addToJquery(_jquery2.default);
+
+_foundation.Foundation.Keyboard = _foundationUtil.Keyboard;
+
+_foundationUtil2.Touch.init(_jquery2.default);
+
+_foundationUtil3.Triggers.init(_jquery2.default, _foundation.Foundation);
+
+_foundation.Foundation.plugin(_foundation2.AccordionMenu, "AccordionMenu");
+
+_foundation.Foundation.plugin(_foundation3.DropdownMenu, "DropdownMenu");
+
+_foundation.Foundation.plugin(_foundation4.OffCanvas, "OffCanvas");
+
+_foundation.Foundation.plugin(_foundation5.ResponsiveMenu, "ResponsiveMenu");
 
 /***/ }),
 /* 11 */
@@ -2228,7 +2255,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /**
  * what-input - A global utility for tracking the current input method (mouse, keyboard or touch).
- * @version v5.0.2
+ * @version v4.3.1
  * @link https://github.com/ten1seven/what-input
  * @license MIT
  */
@@ -2286,7 +2313,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -2295,25 +2322,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * variables
 	   */
 
-	  // cache document.documentElement
-	  var docElem = document.documentElement;
-
-	  // currently focused dom element
-	  var currentElement = null;
-
 	  // last used input type
 	  var currentInput = 'initial';
 
 	  // last used input intent
-	  var currentIntent = currentInput;
+	  var currentIntent = null;
 
-	  // event buffer timer
-	  var eventTimer = null;
+	  // cache document.documentElement
+	  var doc = document.documentElement;
 
 	  // form input types
 	  var formInputs = ['input', 'select', 'textarea'];
 
-	  // empty array for holding callback functions
 	  var functionList = [];
 
 	  // list of modifier keys commonly used with the mouse and
@@ -2323,6 +2343,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  18, // alt
 	  91, // Windows key / left Apple cmd
 	  93 // Windows menu / right Apple cmd
+	  ];
+
+	  // list of keys for which we change intent even for form inputs
+	  var changeIntentMap = [9 // tab
 	  ];
 
 	  // mapping of events to input types
@@ -2336,9 +2360,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    pointerdown: 'pointer',
 	    pointermove: 'pointer',
 	    touchstart: 'touch'
+	  };
 
-	    // boolean: true if touch buffer is active
-	  };var isBuffering = false;
+	  // array of all used input types
+	  var inputTypes = [];
+
+	  // boolean: true if touch buffer is active
+	  var isBuffering = false;
 
 	  // boolean: true if the page is being scrolled
 	  var isScrolling = false;
@@ -2347,15 +2375,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var mousePos = {
 	    x: null,
 	    y: null
+	  };
 
-	    // map of IE 10 pointer events
-	  };var pointerMap = {
+	  // map of IE 10 pointer events
+	  var pointerMap = {
 	    2: 'touch',
 	    3: 'touch', // treat pen like touch
 	    4: 'mouse'
+	  };
 
-	    // check support for passive event listeners
-	  };var supportsPassive = false;
+	  var supportsPassive = false;
 
 	  try {
 	    var opts = Object.defineProperty({}, 'passive', {
@@ -2376,8 +2405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    inputMap[detectWheel()] = 'mouse';
 
 	    addListeners();
-	    doUpdate('input');
-	    doUpdate('intent');
+	    setInput();
 	  };
 
 	  /*
@@ -2392,125 +2420,122 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // pointer events (mouse, pen, touch)
 	    if (window.PointerEvent) {
-	      window.addEventListener('pointerdown', setInput);
-	      window.addEventListener('pointermove', setIntent);
+	      doc.addEventListener('pointerdown', updateInput);
+	      doc.addEventListener('pointermove', setIntent);
 	    } else if (window.MSPointerEvent) {
-	      window.addEventListener('MSPointerDown', setInput);
-	      window.addEventListener('MSPointerMove', setIntent);
+	      doc.addEventListener('MSPointerDown', updateInput);
+	      doc.addEventListener('MSPointerMove', setIntent);
 	    } else {
 	      // mouse events
-	      window.addEventListener('mousedown', setInput);
-	      window.addEventListener('mousemove', setIntent);
+	      doc.addEventListener('mousedown', updateInput);
+	      doc.addEventListener('mousemove', setIntent);
 
 	      // touch events
 	      if ('ontouchstart' in window) {
-	        window.addEventListener('touchstart', eventBuffer, options);
-	        window.addEventListener('touchend', setInput);
+	        doc.addEventListener('touchstart', touchBuffer, options);
+	        doc.addEventListener('touchend', touchBuffer);
 	      }
 	    }
 
 	    // mouse wheel
-	    window.addEventListener(detectWheel(), setIntent, options);
+	    doc.addEventListener(detectWheel(), setIntent, options);
 
 	    // keyboard events
-	    window.addEventListener('keydown', eventBuffer);
-	    window.addEventListener('keyup', eventBuffer);
-
-	    // focus events
-	    window.addEventListener('focusin', setElement);
-	    window.addEventListener('focusout', clearElement);
+	    doc.addEventListener('keydown', updateInput);
+	    doc.addEventListener('keyup', updateInput);
 	  };
 
 	  // checks conditions before updating new input
-	  var setInput = function setInput(event) {
-	    // only execute if the event buffer timer isn't running
+	  var updateInput = function updateInput(event) {
+	    // only execute if the touch buffer timer isn't running
 	    if (!isBuffering) {
 	      var eventKey = event.which;
 	      var value = inputMap[event.type];
+	      if (value === 'pointer') value = pointerType(event);
 
-	      if (value === 'pointer') {
-	        value = pointerType(event);
-	      }
-
-	      var shouldUpdate = value === 'keyboard' && eventKey && ignoreMap.indexOf(eventKey) === -1 || value === 'mouse' || value === 'touch';
-
-	      if (currentInput !== value && shouldUpdate) {
-	        currentInput = value;
-	        doUpdate('input');
-	      }
-
-	      if (currentIntent !== value && shouldUpdate) {
-	        // preserve intent for keyboard typing in form fields
+	      if (currentInput !== value || currentIntent !== value) {
 	        var activeElem = document.activeElement;
+	        var activeInput = false;
 	        var notFormInput = activeElem && activeElem.nodeName && formInputs.indexOf(activeElem.nodeName.toLowerCase()) === -1;
 
-	        if (notFormInput) {
-	          currentIntent = value;
-	          doUpdate('intent');
+	        if (notFormInput || changeIntentMap.indexOf(eventKey) !== -1) {
+	          activeInput = true;
+	        }
+
+	        if (value === 'touch' ||
+	        // ignore mouse modifier keys
+	        value === 'mouse' ||
+	        // don't switch if the current element is a form input
+	        value === 'keyboard' && eventKey && activeInput && ignoreMap.indexOf(eventKey) === -1) {
+	          // set the current and catch-all variable
+	          currentInput = currentIntent = value;
+
+	          setInput();
 	        }
 	      }
 	    }
 	  };
 
 	  // updates the doc and `inputTypes` array with new input
-	  var doUpdate = function doUpdate(which) {
-	    docElem.setAttribute('data-what' + which, which === 'input' ? currentInput : currentIntent);
+	  var setInput = function setInput() {
+	    doc.setAttribute('data-whatinput', currentInput);
+	    doc.setAttribute('data-whatintent', currentInput);
 
-	    fireFunctions(which);
+	    if (inputTypes.indexOf(currentInput) === -1) {
+	      inputTypes.push(currentInput);
+	      doc.className += ' whatinput-types-' + currentInput;
+	    }
+
+	    fireFunctions('input');
 	  };
 
 	  // updates input intent for `mousemove` and `pointermove`
 	  var setIntent = function setIntent(event) {
-	    // test to see if `mousemove` happened relative to the screen to detect scrolling versus mousemove
-	    detectScrolling(event);
+	    // test to see if `mousemove` happened relative to the screen
+	    // to detect scrolling versus mousemove
+	    if (mousePos['x'] !== event.screenX || mousePos['y'] !== event.screenY) {
+	      isScrolling = false;
 
-	    // only execute if the event buffer timer isn't running
+	      mousePos['x'] = event.screenX;
+	      mousePos['y'] = event.screenY;
+	    } else {
+	      isScrolling = true;
+	    }
+
+	    // only execute if the touch buffer timer isn't running
 	    // or scrolling isn't happening
 	    if (!isBuffering && !isScrolling) {
 	      var value = inputMap[event.type];
-	      if (value === 'pointer') {
-	        value = pointerType(event);
-	      }
+	      if (value === 'pointer') value = pointerType(event);
 
 	      if (currentIntent !== value) {
 	        currentIntent = value;
-	        doUpdate('intent');
+
+	        doc.setAttribute('data-whatintent', currentIntent);
+
+	        fireFunctions('intent');
 	      }
 	    }
 	  };
 
-	  var setElement = function setElement(event) {
-	    currentElement = event.target.nodeName.toLowerCase();
-	    docElem.setAttribute('data-whatelement', currentElement);
+	  // buffers touch events because they frequently also fire mouse events
+	  var touchBuffer = function touchBuffer(event) {
+	    if (event.type === 'touchstart') {
+	      isBuffering = false;
 
-	    if (event.target.classList && event.target.classList.length) {
-	      docElem.setAttribute('data-whatclasses', event.target.classList.toString().replace(' ', ','));
+	      // set the current input
+	      updateInput(event);
+	    } else {
+	      isBuffering = true;
 	    }
 	  };
 
-	  var clearElement = function clearElement() {
-	    currentElement = null;
-
-	    docElem.removeAttribute('data-whatelement');
-	    docElem.removeAttribute('data-whatclasses');
-	  };
-
-	  // buffers events that frequently also fire mouse events
-	  var eventBuffer = function eventBuffer(event) {
-	    // set the current input
-	    setInput(event);
-
-	    // clear the timer if it happens to be running
-	    window.clearTimeout(eventTimer);
-
-	    // set the isBuffering to `true`
-	    isBuffering = true;
-
-	    // run the timer
-	    eventTimer = window.setTimeout(function () {
-	      // if the timer runs out, set isBuffering back to `false`
-	      isBuffering = false;
-	    }, 100);
+	  var fireFunctions = function fireFunctions(type) {
+	    for (var i = 0, len = functionList.length; i < len; i++) {
+	      if (functionList[i].type === type) {
+	        functionList[i].fn.call(undefined, currentIntent);
+	      }
+	    }
 	  };
 
 	  /*
@@ -2543,32 +2568,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return wheelType;
 	  };
 
-	  // runs callback functions
-	  var fireFunctions = function fireFunctions(type) {
-	    for (var i = 0, len = functionList.length; i < len; i++) {
-	      if (functionList[i].type === type) {
-	        functionList[i].fn.call(undefined, type === 'input' ? currentInput : currentIntent);
-	      }
-	    }
-	  };
-
-	  // finds matching element in an object
 	  var objPos = function objPos(match) {
 	    for (var i = 0, len = functionList.length; i < len; i++) {
 	      if (functionList[i].fn === match) {
 	        return i;
 	      }
-	    }
-	  };
-
-	  var detectScrolling = function detectScrolling(event) {
-	    if (mousePos['x'] !== event.screenX || mousePos['y'] !== event.screenY) {
-	      isScrolling = false;
-
-	      mousePos['x'] = event.screenX;
-	      mousePos['y'] = event.screenY;
-	    } else {
-	      isScrolling = true;
 	    }
 	  };
 
@@ -2588,16 +2592,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return {
 	    // returns string: the current input type
-	    // opt: 'intent'|'input'
-	    // 'input' (default): returns the same value as the `data-whatinput` attribute
-	    // 'intent': includes `data-whatintent` value if it's different than `data-whatinput`
+	    // opt: 'loose'|'strict'
+	    // 'strict' (default): returns the same value as the `data-whatinput` attribute
+	    // 'loose': includes `data-whatintent` value if it's more current than `data-whatinput`
 	    ask: function ask(opt) {
-	      return opt === 'intent' ? currentIntent : currentInput;
+	      return opt === 'loose' ? currentIntent : currentInput;
 	    },
 
-	    // returns string: the currently focused element or null
-	    element: function element() {
-	      return currentElement;
+	    // returns array: all the detected input types
+	    types: function types() {
+	      return inputTypes;
 	    },
 
 	    // overwrites ignored keys with provided array
@@ -2625,7 +2629,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}();
 
-/***/ })
+/***/ }
 /******/ ])
 });
 ;
@@ -2641,39 +2645,17 @@ var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _foundation = __webpack_require__(13);
+var _whatInput = __webpack_require__(11);
 
-var _foundationUtil = __webpack_require__(2);
+var _whatInput2 = _interopRequireDefault(_whatInput);
 
-var _foundationUtil2 = __webpack_require__(14);
-
-var _foundationUtil3 = __webpack_require__(6);
-
-var _foundation2 = __webpack_require__(7);
-
-var _foundation3 = __webpack_require__(8);
-
-var _foundation4 = __webpack_require__(16);
-
-var _foundation5 = __webpack_require__(17);
+__webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_foundation.Foundation.addToJquery(_jquery2.default);
-
-_foundation.Foundation.Keyboard = _foundationUtil.Keyboard;
-
-_foundationUtil2.Touch.init(_jquery2.default);
-
-_foundationUtil3.Triggers.init(_jquery2.default, _foundation.Foundation);
-
-_foundation.Foundation.plugin(_foundation2.AccordionMenu, "AccordionMenu");
-
-_foundation.Foundation.plugin(_foundation3.DropdownMenu, "DropdownMenu");
-
-_foundation.Foundation.plugin(_foundation4.OffCanvas, "OffCanvas");
-
-_foundation.Foundation.plugin(_foundation5.ResponsiveMenu, "ResponsiveMenu");
+(0, _jquery2.default)(function () {
+  (0, _jquery2.default)(document).foundation();
+});
 
 /***/ }),
 /* 13 */
@@ -3050,1141 +3032,6 @@ exports.Foundation = Foundation;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Touch = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //**************************************************
-//**Work inspired by multiple jquery swipe plugins**
-//**Done by Yohai Ararat ***************************
-//**************************************************
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Touch = {};
-
-var startPosX,
-    startPosY,
-    startTime,
-    elapsedTime,
-    isMoving = false;
-
-function onTouchEnd() {
-  //  alert(this);
-  this.removeEventListener('touchmove', onTouchMove);
-  this.removeEventListener('touchend', onTouchEnd);
-  isMoving = false;
-}
-
-function onTouchMove(e) {
-  if (_jquery2.default.spotSwipe.preventDefault) {
-    e.preventDefault();
-  }
-  if (isMoving) {
-    var x = e.touches[0].pageX;
-    var y = e.touches[0].pageY;
-    var dx = startPosX - x;
-    var dy = startPosY - y;
-    var dir;
-    elapsedTime = new Date().getTime() - startTime;
-    if (Math.abs(dx) >= _jquery2.default.spotSwipe.moveThreshold && elapsedTime <= _jquery2.default.spotSwipe.timeThreshold) {
-      dir = dx > 0 ? 'left' : 'right';
-    }
-    // else if(Math.abs(dy) >= $.spotSwipe.moveThreshold && elapsedTime <= $.spotSwipe.timeThreshold) {
-    //   dir = dy > 0 ? 'down' : 'up';
-    // }
-    if (dir) {
-      e.preventDefault();
-      onTouchEnd.call(this);
-      (0, _jquery2.default)(this).trigger('swipe', dir).trigger('swipe' + dir);
-    }
-  }
-}
-
-function onTouchStart(e) {
-  if (e.touches.length == 1) {
-    startPosX = e.touches[0].pageX;
-    startPosY = e.touches[0].pageY;
-    isMoving = true;
-    startTime = new Date().getTime();
-    this.addEventListener('touchmove', onTouchMove, false);
-    this.addEventListener('touchend', onTouchEnd, false);
-  }
-}
-
-function init() {
-  this.addEventListener && this.addEventListener('touchstart', onTouchStart, false);
-}
-
-function teardown() {
-  this.removeEventListener('touchstart', onTouchStart);
-}
-
-var SpotSwipe = function () {
-  function SpotSwipe($) {
-    _classCallCheck(this, SpotSwipe);
-
-    this.version = '1.0.0';
-    this.enabled = 'ontouchstart' in document.documentElement;
-    this.preventDefault = false;
-    this.moveThreshold = 75;
-    this.timeThreshold = 200;
-    this.$ = $;
-    this._init();
-  }
-
-  _createClass(SpotSwipe, [{
-    key: '_init',
-    value: function _init() {
-      var $ = this.$;
-      $.event.special.swipe = { setup: init };
-
-      $.each(['left', 'up', 'down', 'right'], function () {
-        $.event.special['swipe' + this] = { setup: function setup() {
-            $(this).on('swipe', $.noop);
-          } };
-      });
-    }
-  }]);
-
-  return SpotSwipe;
-}();
-
-/****************************************************
- * As far as I can tell, both setupSpotSwipe and    *
- * setupTouchHandler should be idempotent,          *
- * because they directly replace functions &        *
- * values, and do not add event handlers directly.  *
- ****************************************************/
-
-Touch.setupSpotSwipe = function ($) {
-  $.spotSwipe = new SpotSwipe($);
-};
-
-/****************************************************
- * Method for adding pseudo drag events to elements *
- ***************************************************/
-Touch.setupTouchHandler = function ($) {
-  $.fn.addTouch = function () {
-    this.each(function (i, el) {
-      $(el).bind('touchstart touchmove touchend touchcancel', function (event) {
-        //we pass the original event object because the jQuery event
-        //object is normalized to w3c specs and does not provide the TouchList
-        handleTouch(event);
-      });
-    });
-
-    var handleTouch = function handleTouch(event) {
-      var touches = event.changedTouches,
-          first = touches[0],
-          eventTypes = {
-        touchstart: 'mousedown',
-        touchmove: 'mousemove',
-        touchend: 'mouseup'
-      },
-          type = eventTypes[event.type],
-          simulatedEvent;
-
-      if ('MouseEvent' in window && typeof window.MouseEvent === 'function') {
-        simulatedEvent = new window.MouseEvent(type, {
-          'bubbles': true,
-          'cancelable': true,
-          'screenX': first.screenX,
-          'screenY': first.screenY,
-          'clientX': first.clientX,
-          'clientY': first.clientY
-        });
-      } else {
-        simulatedEvent = document.createEvent('MouseEvent');
-        simulatedEvent.initMouseEvent(type, true, true, window, 1, first.screenX, first.screenY, first.clientX, first.clientY, false, false, false, false, 0 /*left*/, null);
-      }
-      first.target.dispatchEvent(simulatedEvent);
-    };
-  };
-};
-
-Touch.init = function ($) {
-  if (typeof $.spotSwipe === 'undefined') {
-    Touch.setupSpotSwipe($);
-    Touch.setupTouchHandler($);
-  }
-};
-
-exports.Touch = Touch;
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Motion = exports.Move = undefined;
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _foundationUtil = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Motion module.
- * @module foundation.motion
- */
-
-var initClasses = ['mui-enter', 'mui-leave'];
-var activeClasses = ['mui-enter-active', 'mui-leave-active'];
-
-var Motion = {
-  animateIn: function animateIn(element, animation, cb) {
-    animate(true, element, animation, cb);
-  },
-
-  animateOut: function animateOut(element, animation, cb) {
-    animate(false, element, animation, cb);
-  }
-};
-
-function Move(duration, elem, fn) {
-  var anim,
-      prog,
-      start = null;
-  // console.log('called');
-
-  if (duration === 0) {
-    fn.apply(elem);
-    elem.trigger('finished.zf.animate', [elem]).triggerHandler('finished.zf.animate', [elem]);
-    return;
-  }
-
-  function move(ts) {
-    if (!start) start = ts;
-    // console.log(start, ts);
-    prog = ts - start;
-    fn.apply(elem);
-
-    if (prog < duration) {
-      anim = window.requestAnimationFrame(move, elem);
-    } else {
-      window.cancelAnimationFrame(anim);
-      elem.trigger('finished.zf.animate', [elem]).triggerHandler('finished.zf.animate', [elem]);
-    }
-  }
-  anim = window.requestAnimationFrame(move);
-}
-
-/**
- * Animates an element in or out using a CSS transition class.
- * @function
- * @private
- * @param {Boolean} isIn - Defines if the animation is in or out.
- * @param {Object} element - jQuery or HTML object to animate.
- * @param {String} animation - CSS class to use.
- * @param {Function} cb - Callback to run when animation is finished.
- */
-function animate(isIn, element, animation, cb) {
-  element = (0, _jquery2.default)(element).eq(0);
-
-  if (!element.length) return;
-
-  var initClass = isIn ? initClasses[0] : initClasses[1];
-  var activeClass = isIn ? activeClasses[0] : activeClasses[1];
-
-  // Set up the animation
-  reset();
-
-  element.addClass(animation).css('transition', 'none');
-
-  requestAnimationFrame(function () {
-    element.addClass(initClass);
-    if (isIn) element.show();
-  });
-
-  // Start the animation
-  requestAnimationFrame(function () {
-    element[0].offsetWidth;
-    element.css('transition', '').addClass(activeClass);
-  });
-
-  // Clean up the animation when it finishes
-  element.one((0, _foundationUtil.transitionend)(element), finish);
-
-  // Hides the element (for out animations), resets the element, and runs a callback
-  function finish() {
-    if (!isIn) element.hide();
-    reset();
-    if (cb) cb.apply(element);
-  }
-
-  // Resets transitions and removes motion-specific classes
-  function reset() {
-    element[0].style.transitionDuration = 0;
-    element.removeClass(initClass + ' ' + activeClass + ' ' + animation);
-  }
-}
-
-exports.Move = Move;
-exports.Motion = Motion;
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.OffCanvas = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _foundationUtil = __webpack_require__(2);
-
-var _foundationUtil2 = __webpack_require__(4);
-
-var _foundationUtil3 = __webpack_require__(1);
-
-var _foundation = __webpack_require__(3);
-
-var _foundationUtil4 = __webpack_require__(6);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * OffCanvas module.
- * @module foundation.offcanvas
- * @requires foundation.util.keyboard
- * @requires foundation.util.mediaQuery
- * @requires foundation.util.triggers
- */
-
-var OffCanvas = function (_Plugin) {
-  _inherits(OffCanvas, _Plugin);
-
-  function OffCanvas() {
-    _classCallCheck(this, OffCanvas);
-
-    return _possibleConstructorReturn(this, (OffCanvas.__proto__ || Object.getPrototypeOf(OffCanvas)).apply(this, arguments));
-  }
-
-  _createClass(OffCanvas, [{
-    key: '_setup',
-
-    /**
-     * Creates a new instance of an off-canvas wrapper.
-     * @class
-     * @name OffCanvas
-     * @fires OffCanvas#init
-     * @param {Object} element - jQuery object to initialize.
-     * @param {Object} options - Overrides to the default plugin settings.
-     */
-    value: function _setup(element, options) {
-      var _this3 = this;
-
-      this.className = 'OffCanvas'; // ie9 back compat
-      this.$element = element;
-      this.options = _jquery2.default.extend({}, OffCanvas.defaults, this.$element.data(), options);
-      this.contentClasses = { base: [], reveal: [] };
-      this.$lastTrigger = (0, _jquery2.default)();
-      this.$triggers = (0, _jquery2.default)();
-      this.position = 'left';
-      this.$content = (0, _jquery2.default)();
-      this.nested = !!this.options.nested;
-
-      // Defines the CSS transition/position classes of the off-canvas content container.
-      (0, _jquery2.default)(['push', 'overlap']).each(function (index, val) {
-        _this3.contentClasses.base.push('has-transition-' + val);
-      });
-      (0, _jquery2.default)(['left', 'right', 'top', 'bottom']).each(function (index, val) {
-        _this3.contentClasses.base.push('has-position-' + val);
-        _this3.contentClasses.reveal.push('has-reveal-' + val);
-      });
-
-      // Triggers init is idempotent, just need to make sure it is initialized
-      _foundationUtil4.Triggers.init(_jquery2.default);
-      _foundationUtil2.MediaQuery._init();
-
-      this._init();
-      this._events();
-
-      _foundationUtil.Keyboard.register('OffCanvas', {
-        'ESCAPE': 'close'
-      });
-    }
-
-    /**
-     * Initializes the off-canvas wrapper by adding the exit overlay (if needed).
-     * @function
-     * @private
-     */
-
-  }, {
-    key: '_init',
-    value: function _init() {
-      var id = this.$element.attr('id');
-
-      this.$element.attr('aria-hidden', 'true');
-
-      // Find off-canvas content, either by ID (if specified), by siblings or by closest selector (fallback)
-      if (this.options.contentId) {
-        this.$content = (0, _jquery2.default)('#' + this.options.contentId);
-      } else if (this.$element.siblings('[data-off-canvas-content]').length) {
-        this.$content = this.$element.siblings('[data-off-canvas-content]').first();
-      } else {
-        this.$content = this.$element.closest('[data-off-canvas-content]').first();
-      }
-
-      if (!this.options.contentId) {
-        // Assume that the off-canvas element is nested if it isn't a sibling of the content
-        this.nested = this.$element.siblings('[data-off-canvas-content]').length === 0;
-      } else if (this.options.contentId && this.options.nested === null) {
-        // Warning if using content ID without setting the nested option
-        // Once the element is nested it is required to work properly in this case
-        console.warn('Remember to use the nested option if using the content ID option!');
-      }
-
-      if (this.nested === true) {
-        // Force transition overlap if nested
-        this.options.transition = 'overlap';
-        // Remove appropriate classes if already assigned in markup
-        this.$element.removeClass('is-transition-push');
-      }
-
-      this.$element.addClass('is-transition-' + this.options.transition + ' is-closed');
-
-      // Find triggers that affect this element and add aria-expanded to them
-      this.$triggers = (0, _jquery2.default)(document).find('[data-open="' + id + '"], [data-close="' + id + '"], [data-toggle="' + id + '"]').attr('aria-expanded', 'false').attr('aria-controls', id);
-
-      // Get position by checking for related CSS class
-      this.position = this.$element.is('.position-left, .position-top, .position-right, .position-bottom') ? this.$element.attr('class').match(/position\-(left|top|right|bottom)/)[1] : this.position;
-
-      // Add an overlay over the content if necessary
-      if (this.options.contentOverlay === true) {
-        var overlay = document.createElement('div');
-        var overlayPosition = (0, _jquery2.default)(this.$element).css("position") === 'fixed' ? 'is-overlay-fixed' : 'is-overlay-absolute';
-        overlay.setAttribute('class', 'js-off-canvas-overlay ' + overlayPosition);
-        this.$overlay = (0, _jquery2.default)(overlay);
-        if (overlayPosition === 'is-overlay-fixed') {
-          (0, _jquery2.default)(this.$overlay).insertAfter(this.$element);
-        } else {
-          this.$content.append(this.$overlay);
-        }
-      }
-
-      this.options.isRevealed = this.options.isRevealed || new RegExp(this.options.revealClass, 'g').test(this.$element[0].className);
-
-      if (this.options.isRevealed === true) {
-        this.options.revealOn = this.options.revealOn || this.$element[0].className.match(/(reveal-for-medium|reveal-for-large)/g)[0].split('-')[2];
-        this._setMQChecker();
-      }
-
-      if (this.options.transitionTime) {
-        this.$element.css('transition-duration', this.options.transitionTime);
-      }
-
-      // Initally remove all transition/position CSS classes from off-canvas content container.
-      this._removeContentClasses();
-    }
-
-    /**
-     * Adds event handlers to the off-canvas wrapper and the exit overlay.
-     * @function
-     * @private
-     */
-
-  }, {
-    key: '_events',
-    value: function _events() {
-      this.$element.off('.zf.trigger .zf.offcanvas').on({
-        'open.zf.trigger': this.open.bind(this),
-        'close.zf.trigger': this.close.bind(this),
-        'toggle.zf.trigger': this.toggle.bind(this),
-        'keydown.zf.offcanvas': this._handleKeyboard.bind(this)
-      });
-
-      if (this.options.closeOnClick === true) {
-        var $target = this.options.contentOverlay ? this.$overlay : this.$content;
-        $target.on({ 'click.zf.offcanvas': this.close.bind(this) });
-      }
-    }
-
-    /**
-     * Applies event listener for elements that will reveal at certain breakpoints.
-     * @private
-     */
-
-  }, {
-    key: '_setMQChecker',
-    value: function _setMQChecker() {
-      var _this = this;
-
-      (0, _jquery2.default)(window).on('changed.zf.mediaquery', function () {
-        if (_foundationUtil2.MediaQuery.atLeast(_this.options.revealOn)) {
-          _this.reveal(true);
-        } else {
-          _this.reveal(false);
-        }
-      }).one('load.zf.offcanvas', function () {
-        if (_foundationUtil2.MediaQuery.atLeast(_this.options.revealOn)) {
-          _this.reveal(true);
-        }
-      });
-    }
-
-    /**
-     * Removes the CSS transition/position classes of the off-canvas content container.
-     * Removing the classes is important when another off-canvas gets opened that uses the same content container.
-     * @param {Boolean} hasReveal - true if related off-canvas element is revealed.
-     * @private
-     */
-
-  }, {
-    key: '_removeContentClasses',
-    value: function _removeContentClasses(hasReveal) {
-      if (typeof hasReveal !== 'boolean') {
-        this.$content.removeClass(this.contentClasses.base.join(' '));
-      } else if (hasReveal === false) {
-        this.$content.removeClass('has-reveal-' + this.position);
-      }
-    }
-
-    /**
-     * Adds the CSS transition/position classes of the off-canvas content container, based on the opening off-canvas element.
-     * Beforehand any transition/position class gets removed.
-     * @param {Boolean} hasReveal - true if related off-canvas element is revealed.
-     * @private
-     */
-
-  }, {
-    key: '_addContentClasses',
-    value: function _addContentClasses(hasReveal) {
-      this._removeContentClasses(hasReveal);
-      if (typeof hasReveal !== 'boolean') {
-        this.$content.addClass('has-transition-' + this.options.transition + ' has-position-' + this.position);
-      } else if (hasReveal === true) {
-        this.$content.addClass('has-reveal-' + this.position);
-      }
-    }
-
-    /**
-     * Handles the revealing/hiding the off-canvas at breakpoints, not the same as open.
-     * @param {Boolean} isRevealed - true if element should be revealed.
-     * @function
-     */
-
-  }, {
-    key: 'reveal',
-    value: function reveal(isRevealed) {
-      if (isRevealed) {
-        this.close();
-        this.isRevealed = true;
-        this.$element.attr('aria-hidden', 'false');
-        this.$element.off('open.zf.trigger toggle.zf.trigger');
-        this.$element.removeClass('is-closed');
-      } else {
-        this.isRevealed = false;
-        this.$element.attr('aria-hidden', 'true');
-        this.$element.off('open.zf.trigger toggle.zf.trigger').on({
-          'open.zf.trigger': this.open.bind(this),
-          'toggle.zf.trigger': this.toggle.bind(this)
-        });
-        this.$element.addClass('is-closed');
-      }
-      this._addContentClasses(isRevealed);
-    }
-
-    /**
-     * Stops scrolling of the body when offcanvas is open on mobile Safari and other troublesome browsers.
-     * @private
-     */
-
-  }, {
-    key: '_stopScrolling',
-    value: function _stopScrolling(event) {
-      return false;
-    }
-
-    // Taken and adapted from http://stackoverflow.com/questions/16889447/prevent-full-page-scrolling-ios
-    // Only really works for y, not sure how to extend to x or if we need to.
-
-  }, {
-    key: '_recordScrollable',
-    value: function _recordScrollable(event) {
-      var elem = this; // called from event handler context with this as elem
-
-      // If the element is scrollable (content overflows), then...
-      if (elem.scrollHeight !== elem.clientHeight) {
-        // If we're at the top, scroll down one pixel to allow scrolling up
-        if (elem.scrollTop === 0) {
-          elem.scrollTop = 1;
-        }
-        // If we're at the bottom, scroll up one pixel to allow scrolling down
-        if (elem.scrollTop === elem.scrollHeight - elem.clientHeight) {
-          elem.scrollTop = elem.scrollHeight - elem.clientHeight - 1;
-        }
-      }
-      elem.allowUp = elem.scrollTop > 0;
-      elem.allowDown = elem.scrollTop < elem.scrollHeight - elem.clientHeight;
-      elem.lastY = event.originalEvent.pageY;
-    }
-  }, {
-    key: '_stopScrollPropagation',
-    value: function _stopScrollPropagation(event) {
-      var elem = this; // called from event handler context with this as elem
-      var up = event.pageY < elem.lastY;
-      var down = !up;
-      elem.lastY = event.pageY;
-
-      if (up && elem.allowUp || down && elem.allowDown) {
-        event.stopPropagation();
-      } else {
-        event.preventDefault();
-      }
-    }
-
-    /**
-     * Opens the off-canvas menu.
-     * @function
-     * @param {Object} event - Event object passed from listener.
-     * @param {jQuery} trigger - element that triggered the off-canvas to open.
-     * @fires OffCanvas#opened
-     */
-
-  }, {
-    key: 'open',
-    value: function open(event, trigger) {
-      if (this.$element.hasClass('is-open') || this.isRevealed) {
-        return;
-      }
-      var _this = this;
-
-      if (trigger) {
-        this.$lastTrigger = trigger;
-      }
-
-      if (this.options.forceTo === 'top') {
-        window.scrollTo(0, 0);
-      } else if (this.options.forceTo === 'bottom') {
-        window.scrollTo(0, document.body.scrollHeight);
-      }
-
-      if (this.options.transitionTime && this.options.transition !== 'overlap') {
-        this.$element.siblings('[data-off-canvas-content]').css('transition-duration', this.options.transitionTime);
-      } else {
-        this.$element.siblings('[data-off-canvas-content]').css('transition-duration', '');
-      }
-
-      /**
-       * Fires when the off-canvas menu opens.
-       * @event OffCanvas#opened
-       */
-      this.$element.addClass('is-open').removeClass('is-closed');
-
-      this.$triggers.attr('aria-expanded', 'true');
-      this.$element.attr('aria-hidden', 'false').trigger('opened.zf.offcanvas');
-
-      this.$content.addClass('is-open-' + this.position);
-
-      // If `contentScroll` is set to false, add class and disable scrolling on touch devices.
-      if (this.options.contentScroll === false) {
-        (0, _jquery2.default)('body').addClass('is-off-canvas-open').on('touchmove', this._stopScrolling);
-        this.$element.on('touchstart', this._recordScrollable);
-        this.$element.on('touchmove', this._stopScrollPropagation);
-      }
-
-      if (this.options.contentOverlay === true) {
-        this.$overlay.addClass('is-visible');
-      }
-
-      if (this.options.closeOnClick === true && this.options.contentOverlay === true) {
-        this.$overlay.addClass('is-closable');
-      }
-
-      if (this.options.autoFocus === true) {
-        this.$element.one((0, _foundationUtil3.transitionend)(this.$element), function () {
-          if (!_this.$element.hasClass('is-open')) {
-            return; // exit if prematurely closed
-          }
-          var canvasFocus = _this.$element.find('[data-autofocus]');
-          if (canvasFocus.length) {
-            canvasFocus.eq(0).focus();
-          } else {
-            _this.$element.find('a, button').eq(0).focus();
-          }
-        });
-      }
-
-      if (this.options.trapFocus === true) {
-        this.$content.attr('tabindex', '-1');
-        _foundationUtil.Keyboard.trapFocus(this.$element);
-      }
-
-      this._addContentClasses();
-    }
-
-    /**
-     * Closes the off-canvas menu.
-     * @function
-     * @param {Function} cb - optional cb to fire after closure.
-     * @fires OffCanvas#closed
-     */
-
-  }, {
-    key: 'close',
-    value: function close(cb) {
-      if (!this.$element.hasClass('is-open') || this.isRevealed) {
-        return;
-      }
-
-      var _this = this;
-
-      this.$element.removeClass('is-open');
-
-      this.$element.attr('aria-hidden', 'true')
-      /**
-       * Fires when the off-canvas menu opens.
-       * @event OffCanvas#closed
-       */
-      .trigger('closed.zf.offcanvas');
-
-      this.$content.removeClass('is-open-left is-open-top is-open-right is-open-bottom');
-
-      // If `contentScroll` is set to false, remove class and re-enable scrolling on touch devices.
-      if (this.options.contentScroll === false) {
-        (0, _jquery2.default)('body').removeClass('is-off-canvas-open').off('touchmove', this._stopScrolling);
-        this.$element.off('touchstart', this._recordScrollable);
-        this.$element.off('touchmove', this._stopScrollPropagation);
-      }
-
-      if (this.options.contentOverlay === true) {
-        this.$overlay.removeClass('is-visible');
-      }
-
-      if (this.options.closeOnClick === true && this.options.contentOverlay === true) {
-        this.$overlay.removeClass('is-closable');
-      }
-
-      this.$triggers.attr('aria-expanded', 'false');
-
-      if (this.options.trapFocus === true) {
-        this.$content.removeAttr('tabindex');
-        _foundationUtil.Keyboard.releaseFocus(this.$element);
-      }
-
-      // Listen to transitionEnd and add class when done.
-      this.$element.one((0, _foundationUtil3.transitionend)(this.$element), function (e) {
-        _this.$element.addClass('is-closed');
-        _this._removeContentClasses();
-      });
-    }
-
-    /**
-     * Toggles the off-canvas menu open or closed.
-     * @function
-     * @param {Object} event - Event object passed from listener.
-     * @param {jQuery} trigger - element that triggered the off-canvas to open.
-     */
-
-  }, {
-    key: 'toggle',
-    value: function toggle(event, trigger) {
-      if (this.$element.hasClass('is-open')) {
-        this.close(event, trigger);
-      } else {
-        this.open(event, trigger);
-      }
-    }
-
-    /**
-     * Handles keyboard input when detected. When the escape key is pressed, the off-canvas menu closes, and focus is restored to the element that opened the menu.
-     * @function
-     * @private
-     */
-
-  }, {
-    key: '_handleKeyboard',
-    value: function _handleKeyboard(e) {
-      var _this4 = this;
-
-      _foundationUtil.Keyboard.handleKey(e, 'OffCanvas', {
-        close: function close() {
-          _this4.close();
-          _this4.$lastTrigger.focus();
-          return true;
-        },
-        handled: function handled() {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      });
-    }
-
-    /**
-     * Destroys the offcanvas plugin.
-     * @function
-     */
-
-  }, {
-    key: '_destroy',
-    value: function _destroy() {
-      this.close();
-      this.$element.off('.zf.trigger .zf.offcanvas');
-      this.$overlay.off('.zf.offcanvas');
-    }
-  }]);
-
-  return OffCanvas;
-}(_foundation.Plugin);
-
-OffCanvas.defaults = {
-  /**
-   * Allow the user to click outside of the menu to close it.
-   * @option
-   * @type {boolean}
-   * @default true
-   */
-  closeOnClick: true,
-
-  /**
-   * Adds an overlay on top of `[data-off-canvas-content]`.
-   * @option
-   * @type {boolean}
-   * @default true
-   */
-  contentOverlay: true,
-
-  /**
-   * Target an off-canvas content container by ID that may be placed anywhere. If null the closest content container will be taken.
-   * @option
-   * @type {?string}
-   * @default null
-   */
-  contentId: null,
-
-  /**
-   * Define the off-canvas element is nested in an off-canvas content. This is required when using the contentId option for a nested element.
-   * @option
-   * @type {boolean}
-   * @default null
-   */
-  nested: null,
-
-  /**
-   * Enable/disable scrolling of the main content when an off canvas panel is open.
-   * @option
-   * @type {boolean}
-   * @default true
-   */
-  contentScroll: true,
-
-  /**
-   * Amount of time in ms the open and close transition requires. If none selected, pulls from body style.
-   * @option
-   * @type {number}
-   * @default null
-   */
-  transitionTime: null,
-
-  /**
-   * Type of transition for the offcanvas menu. Options are 'push', 'detached' or 'slide'.
-   * @option
-   * @type {string}
-   * @default push
-   */
-  transition: 'push',
-
-  /**
-   * Force the page to scroll to top or bottom on open.
-   * @option
-   * @type {?string}
-   * @default null
-   */
-  forceTo: null,
-
-  /**
-   * Allow the offcanvas to remain open for certain breakpoints.
-   * @option
-   * @type {boolean}
-   * @default false
-   */
-  isRevealed: false,
-
-  /**
-   * Breakpoint at which to reveal. JS will use a RegExp to target standard classes, if changing classnames, pass your class with the `revealClass` option.
-   * @option
-   * @type {?string}
-   * @default null
-   */
-  revealOn: null,
-
-  /**
-   * Force focus to the offcanvas on open. If true, will focus the opening trigger on close.
-   * @option
-   * @type {boolean}
-   * @default true
-   */
-  autoFocus: true,
-
-  /**
-   * Class used to force an offcanvas to remain open. Foundation defaults for this are `reveal-for-large` & `reveal-for-medium`.
-   * @option
-   * @type {string}
-   * @default reveal-for-
-   * @todo improve the regex testing for this.
-   */
-  revealClass: 'reveal-for-',
-
-  /**
-   * Triggers optional focus trapping when opening an offcanvas. Sets tabindex of [data-off-canvas-content] to -1 for accessibility purposes.
-   * @option
-   * @type {boolean}
-   * @default false
-   */
-  trapFocus: false
-};
-
-exports.OffCanvas = OffCanvas;
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ResponsiveMenu = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _foundationUtil = __webpack_require__(4);
-
-var _foundationUtil2 = __webpack_require__(1);
-
-var _foundation = __webpack_require__(3);
-
-var _foundation2 = __webpack_require__(8);
-
-var _foundation3 = __webpack_require__(18);
-
-var _foundation4 = __webpack_require__(7);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var MenuPlugins = {
-  dropdown: {
-    cssClass: 'dropdown',
-    plugin: _foundation2.DropdownMenu
-  },
-  drilldown: {
-    cssClass: 'drilldown',
-    plugin: _foundation3.Drilldown
-  },
-  accordion: {
-    cssClass: 'accordion-menu',
-    plugin: _foundation4.AccordionMenu
-  }
-};
-
-// import "foundation.util.triggers.js";
-
-
-/**
- * ResponsiveMenu module.
- * @module foundation.responsiveMenu
- * @requires foundation.util.triggers
- * @requires foundation.util.mediaQuery
- */
-
-var ResponsiveMenu = function (_Plugin) {
-  _inherits(ResponsiveMenu, _Plugin);
-
-  function ResponsiveMenu() {
-    _classCallCheck(this, ResponsiveMenu);
-
-    return _possibleConstructorReturn(this, (ResponsiveMenu.__proto__ || Object.getPrototypeOf(ResponsiveMenu)).apply(this, arguments));
-  }
-
-  _createClass(ResponsiveMenu, [{
-    key: '_setup',
-
-    /**
-     * Creates a new instance of a responsive menu.
-     * @class
-     * @name ResponsiveMenu
-     * @fires ResponsiveMenu#init
-     * @param {jQuery} element - jQuery object to make into a dropdown menu.
-     * @param {Object} options - Overrides to the default plugin settings.
-     */
-    value: function _setup(element, options) {
-      this.$element = (0, _jquery2.default)(element);
-      this.rules = this.$element.data('responsive-menu');
-      this.currentMq = null;
-      this.currentPlugin = null;
-      this.className = 'ResponsiveMenu'; // ie9 back compat
-
-      this._init();
-      this._events();
-    }
-
-    /**
-     * Initializes the Menu by parsing the classes from the 'data-ResponsiveMenu' attribute on the element.
-     * @function
-     * @private
-     */
-
-  }, {
-    key: '_init',
-    value: function _init() {
-
-      _foundationUtil.MediaQuery._init();
-      // The first time an Interchange plugin is initialized, this.rules is converted from a string of "classes" to an object of rules
-      if (typeof this.rules === 'string') {
-        var rulesTree = {};
-
-        // Parse rules from "classes" pulled from data attribute
-        var rules = this.rules.split(' ');
-
-        // Iterate through every rule found
-        for (var i = 0; i < rules.length; i++) {
-          var rule = rules[i].split('-');
-          var ruleSize = rule.length > 1 ? rule[0] : 'small';
-          var rulePlugin = rule.length > 1 ? rule[1] : rule[0];
-
-          if (MenuPlugins[rulePlugin] !== null) {
-            rulesTree[ruleSize] = MenuPlugins[rulePlugin];
-          }
-        }
-
-        this.rules = rulesTree;
-      }
-
-      if (!_jquery2.default.isEmptyObject(this.rules)) {
-        this._checkMediaQueries();
-      }
-      // Add data-mutate since children may need it.
-      this.$element.attr('data-mutate', this.$element.attr('data-mutate') || (0, _foundationUtil2.GetYoDigits)(6, 'responsive-menu'));
-    }
-
-    /**
-     * Initializes events for the Menu.
-     * @function
-     * @private
-     */
-
-  }, {
-    key: '_events',
-    value: function _events() {
-      var _this = this;
-
-      (0, _jquery2.default)(window).on('changed.zf.mediaquery', function () {
-        _this._checkMediaQueries();
-      });
-      // $(window).on('resize.zf.ResponsiveMenu', function() {
-      //   _this._checkMediaQueries();
-      // });
-    }
-
-    /**
-     * Checks the current screen width against available media queries. If the media query has changed, and the plugin needed has changed, the plugins will swap out.
-     * @function
-     * @private
-     */
-
-  }, {
-    key: '_checkMediaQueries',
-    value: function _checkMediaQueries() {
-      var matchedMq,
-          _this = this;
-      // Iterate through each rule and find the last matching rule
-      _jquery2.default.each(this.rules, function (key) {
-        if (_foundationUtil.MediaQuery.atLeast(key)) {
-          matchedMq = key;
-        }
-      });
-
-      // No match? No dice
-      if (!matchedMq) return;
-
-      // Plugin already initialized? We good
-      if (this.currentPlugin instanceof this.rules[matchedMq].plugin) return;
-
-      // Remove existing plugin-specific CSS classes
-      _jquery2.default.each(MenuPlugins, function (key, value) {
-        _this.$element.removeClass(value.cssClass);
-      });
-
-      // Add the CSS class for the new plugin
-      this.$element.addClass(this.rules[matchedMq].cssClass);
-
-      // Create an instance of the new plugin
-      if (this.currentPlugin) this.currentPlugin.destroy();
-      this.currentPlugin = new this.rules[matchedMq].plugin(this.$element, {});
-    }
-
-    /**
-     * Destroys the instance of the current plugin on this element, as well as the window resize handler that switches the plugins out.
-     * @function
-     */
-
-  }, {
-    key: '_destroy',
-    value: function _destroy() {
-      this.currentPlugin.destroy();
-      (0, _jquery2.default)(window).off('.zf.ResponsiveMenu');
-    }
-  }]);
-
-  return ResponsiveMenu;
-}(_foundation.Plugin);
-
-ResponsiveMenu.defaults = {};
-
-exports.ResponsiveMenu = ResponsiveMenu;
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.Drilldown = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4193,15 +3040,15 @@ var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _foundationUtil = __webpack_require__(2);
+var _foundationUtil = __webpack_require__(3);
 
 var _foundationUtil2 = __webpack_require__(5);
 
 var _foundationUtil3 = __webpack_require__(1);
 
-var _foundationUtil4 = __webpack_require__(9);
+var _foundationUtil4 = __webpack_require__(8);
 
-var _foundation = __webpack_require__(3);
+var _foundation = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4882,6 +3729,1141 @@ Drilldown.defaults = {
 };
 
 exports.Drilldown = Drilldown;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.OffCanvas = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _foundationUtil = __webpack_require__(3);
+
+var _foundationUtil2 = __webpack_require__(4);
+
+var _foundationUtil3 = __webpack_require__(1);
+
+var _foundation = __webpack_require__(2);
+
+var _foundationUtil4 = __webpack_require__(9);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * OffCanvas module.
+ * @module foundation.offcanvas
+ * @requires foundation.util.keyboard
+ * @requires foundation.util.mediaQuery
+ * @requires foundation.util.triggers
+ */
+
+var OffCanvas = function (_Plugin) {
+  _inherits(OffCanvas, _Plugin);
+
+  function OffCanvas() {
+    _classCallCheck(this, OffCanvas);
+
+    return _possibleConstructorReturn(this, (OffCanvas.__proto__ || Object.getPrototypeOf(OffCanvas)).apply(this, arguments));
+  }
+
+  _createClass(OffCanvas, [{
+    key: '_setup',
+
+    /**
+     * Creates a new instance of an off-canvas wrapper.
+     * @class
+     * @name OffCanvas
+     * @fires OffCanvas#init
+     * @param {Object} element - jQuery object to initialize.
+     * @param {Object} options - Overrides to the default plugin settings.
+     */
+    value: function _setup(element, options) {
+      var _this3 = this;
+
+      this.className = 'OffCanvas'; // ie9 back compat
+      this.$element = element;
+      this.options = _jquery2.default.extend({}, OffCanvas.defaults, this.$element.data(), options);
+      this.contentClasses = { base: [], reveal: [] };
+      this.$lastTrigger = (0, _jquery2.default)();
+      this.$triggers = (0, _jquery2.default)();
+      this.position = 'left';
+      this.$content = (0, _jquery2.default)();
+      this.nested = !!this.options.nested;
+
+      // Defines the CSS transition/position classes of the off-canvas content container.
+      (0, _jquery2.default)(['push', 'overlap']).each(function (index, val) {
+        _this3.contentClasses.base.push('has-transition-' + val);
+      });
+      (0, _jquery2.default)(['left', 'right', 'top', 'bottom']).each(function (index, val) {
+        _this3.contentClasses.base.push('has-position-' + val);
+        _this3.contentClasses.reveal.push('has-reveal-' + val);
+      });
+
+      // Triggers init is idempotent, just need to make sure it is initialized
+      _foundationUtil4.Triggers.init(_jquery2.default);
+      _foundationUtil2.MediaQuery._init();
+
+      this._init();
+      this._events();
+
+      _foundationUtil.Keyboard.register('OffCanvas', {
+        'ESCAPE': 'close'
+      });
+    }
+
+    /**
+     * Initializes the off-canvas wrapper by adding the exit overlay (if needed).
+     * @function
+     * @private
+     */
+
+  }, {
+    key: '_init',
+    value: function _init() {
+      var id = this.$element.attr('id');
+
+      this.$element.attr('aria-hidden', 'true');
+
+      // Find off-canvas content, either by ID (if specified), by siblings or by closest selector (fallback)
+      if (this.options.contentId) {
+        this.$content = (0, _jquery2.default)('#' + this.options.contentId);
+      } else if (this.$element.siblings('[data-off-canvas-content]').length) {
+        this.$content = this.$element.siblings('[data-off-canvas-content]').first();
+      } else {
+        this.$content = this.$element.closest('[data-off-canvas-content]').first();
+      }
+
+      if (!this.options.contentId) {
+        // Assume that the off-canvas element is nested if it isn't a sibling of the content
+        this.nested = this.$element.siblings('[data-off-canvas-content]').length === 0;
+      } else if (this.options.contentId && this.options.nested === null) {
+        // Warning if using content ID without setting the nested option
+        // Once the element is nested it is required to work properly in this case
+        console.warn('Remember to use the nested option if using the content ID option!');
+      }
+
+      if (this.nested === true) {
+        // Force transition overlap if nested
+        this.options.transition = 'overlap';
+        // Remove appropriate classes if already assigned in markup
+        this.$element.removeClass('is-transition-push');
+      }
+
+      this.$element.addClass('is-transition-' + this.options.transition + ' is-closed');
+
+      // Find triggers that affect this element and add aria-expanded to them
+      this.$triggers = (0, _jquery2.default)(document).find('[data-open="' + id + '"], [data-close="' + id + '"], [data-toggle="' + id + '"]').attr('aria-expanded', 'false').attr('aria-controls', id);
+
+      // Get position by checking for related CSS class
+      this.position = this.$element.is('.position-left, .position-top, .position-right, .position-bottom') ? this.$element.attr('class').match(/position\-(left|top|right|bottom)/)[1] : this.position;
+
+      // Add an overlay over the content if necessary
+      if (this.options.contentOverlay === true) {
+        var overlay = document.createElement('div');
+        var overlayPosition = (0, _jquery2.default)(this.$element).css("position") === 'fixed' ? 'is-overlay-fixed' : 'is-overlay-absolute';
+        overlay.setAttribute('class', 'js-off-canvas-overlay ' + overlayPosition);
+        this.$overlay = (0, _jquery2.default)(overlay);
+        if (overlayPosition === 'is-overlay-fixed') {
+          (0, _jquery2.default)(this.$overlay).insertAfter(this.$element);
+        } else {
+          this.$content.append(this.$overlay);
+        }
+      }
+
+      this.options.isRevealed = this.options.isRevealed || new RegExp(this.options.revealClass, 'g').test(this.$element[0].className);
+
+      if (this.options.isRevealed === true) {
+        this.options.revealOn = this.options.revealOn || this.$element[0].className.match(/(reveal-for-medium|reveal-for-large)/g)[0].split('-')[2];
+        this._setMQChecker();
+      }
+
+      if (this.options.transitionTime) {
+        this.$element.css('transition-duration', this.options.transitionTime);
+      }
+
+      // Initally remove all transition/position CSS classes from off-canvas content container.
+      this._removeContentClasses();
+    }
+
+    /**
+     * Adds event handlers to the off-canvas wrapper and the exit overlay.
+     * @function
+     * @private
+     */
+
+  }, {
+    key: '_events',
+    value: function _events() {
+      this.$element.off('.zf.trigger .zf.offcanvas').on({
+        'open.zf.trigger': this.open.bind(this),
+        'close.zf.trigger': this.close.bind(this),
+        'toggle.zf.trigger': this.toggle.bind(this),
+        'keydown.zf.offcanvas': this._handleKeyboard.bind(this)
+      });
+
+      if (this.options.closeOnClick === true) {
+        var $target = this.options.contentOverlay ? this.$overlay : this.$content;
+        $target.on({ 'click.zf.offcanvas': this.close.bind(this) });
+      }
+    }
+
+    /**
+     * Applies event listener for elements that will reveal at certain breakpoints.
+     * @private
+     */
+
+  }, {
+    key: '_setMQChecker',
+    value: function _setMQChecker() {
+      var _this = this;
+
+      (0, _jquery2.default)(window).on('changed.zf.mediaquery', function () {
+        if (_foundationUtil2.MediaQuery.atLeast(_this.options.revealOn)) {
+          _this.reveal(true);
+        } else {
+          _this.reveal(false);
+        }
+      }).one('load.zf.offcanvas', function () {
+        if (_foundationUtil2.MediaQuery.atLeast(_this.options.revealOn)) {
+          _this.reveal(true);
+        }
+      });
+    }
+
+    /**
+     * Removes the CSS transition/position classes of the off-canvas content container.
+     * Removing the classes is important when another off-canvas gets opened that uses the same content container.
+     * @param {Boolean} hasReveal - true if related off-canvas element is revealed.
+     * @private
+     */
+
+  }, {
+    key: '_removeContentClasses',
+    value: function _removeContentClasses(hasReveal) {
+      if (typeof hasReveal !== 'boolean') {
+        this.$content.removeClass(this.contentClasses.base.join(' '));
+      } else if (hasReveal === false) {
+        this.$content.removeClass('has-reveal-' + this.position);
+      }
+    }
+
+    /**
+     * Adds the CSS transition/position classes of the off-canvas content container, based on the opening off-canvas element.
+     * Beforehand any transition/position class gets removed.
+     * @param {Boolean} hasReveal - true if related off-canvas element is revealed.
+     * @private
+     */
+
+  }, {
+    key: '_addContentClasses',
+    value: function _addContentClasses(hasReveal) {
+      this._removeContentClasses(hasReveal);
+      if (typeof hasReveal !== 'boolean') {
+        this.$content.addClass('has-transition-' + this.options.transition + ' has-position-' + this.position);
+      } else if (hasReveal === true) {
+        this.$content.addClass('has-reveal-' + this.position);
+      }
+    }
+
+    /**
+     * Handles the revealing/hiding the off-canvas at breakpoints, not the same as open.
+     * @param {Boolean} isRevealed - true if element should be revealed.
+     * @function
+     */
+
+  }, {
+    key: 'reveal',
+    value: function reveal(isRevealed) {
+      if (isRevealed) {
+        this.close();
+        this.isRevealed = true;
+        this.$element.attr('aria-hidden', 'false');
+        this.$element.off('open.zf.trigger toggle.zf.trigger');
+        this.$element.removeClass('is-closed');
+      } else {
+        this.isRevealed = false;
+        this.$element.attr('aria-hidden', 'true');
+        this.$element.off('open.zf.trigger toggle.zf.trigger').on({
+          'open.zf.trigger': this.open.bind(this),
+          'toggle.zf.trigger': this.toggle.bind(this)
+        });
+        this.$element.addClass('is-closed');
+      }
+      this._addContentClasses(isRevealed);
+    }
+
+    /**
+     * Stops scrolling of the body when offcanvas is open on mobile Safari and other troublesome browsers.
+     * @private
+     */
+
+  }, {
+    key: '_stopScrolling',
+    value: function _stopScrolling(event) {
+      return false;
+    }
+
+    // Taken and adapted from http://stackoverflow.com/questions/16889447/prevent-full-page-scrolling-ios
+    // Only really works for y, not sure how to extend to x or if we need to.
+
+  }, {
+    key: '_recordScrollable',
+    value: function _recordScrollable(event) {
+      var elem = this; // called from event handler context with this as elem
+
+      // If the element is scrollable (content overflows), then...
+      if (elem.scrollHeight !== elem.clientHeight) {
+        // If we're at the top, scroll down one pixel to allow scrolling up
+        if (elem.scrollTop === 0) {
+          elem.scrollTop = 1;
+        }
+        // If we're at the bottom, scroll up one pixel to allow scrolling down
+        if (elem.scrollTop === elem.scrollHeight - elem.clientHeight) {
+          elem.scrollTop = elem.scrollHeight - elem.clientHeight - 1;
+        }
+      }
+      elem.allowUp = elem.scrollTop > 0;
+      elem.allowDown = elem.scrollTop < elem.scrollHeight - elem.clientHeight;
+      elem.lastY = event.originalEvent.pageY;
+    }
+  }, {
+    key: '_stopScrollPropagation',
+    value: function _stopScrollPropagation(event) {
+      var elem = this; // called from event handler context with this as elem
+      var up = event.pageY < elem.lastY;
+      var down = !up;
+      elem.lastY = event.pageY;
+
+      if (up && elem.allowUp || down && elem.allowDown) {
+        event.stopPropagation();
+      } else {
+        event.preventDefault();
+      }
+    }
+
+    /**
+     * Opens the off-canvas menu.
+     * @function
+     * @param {Object} event - Event object passed from listener.
+     * @param {jQuery} trigger - element that triggered the off-canvas to open.
+     * @fires OffCanvas#opened
+     */
+
+  }, {
+    key: 'open',
+    value: function open(event, trigger) {
+      if (this.$element.hasClass('is-open') || this.isRevealed) {
+        return;
+      }
+      var _this = this;
+
+      if (trigger) {
+        this.$lastTrigger = trigger;
+      }
+
+      if (this.options.forceTo === 'top') {
+        window.scrollTo(0, 0);
+      } else if (this.options.forceTo === 'bottom') {
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+
+      if (this.options.transitionTime && this.options.transition !== 'overlap') {
+        this.$element.siblings('[data-off-canvas-content]').css('transition-duration', this.options.transitionTime);
+      } else {
+        this.$element.siblings('[data-off-canvas-content]').css('transition-duration', '');
+      }
+
+      /**
+       * Fires when the off-canvas menu opens.
+       * @event OffCanvas#opened
+       */
+      this.$element.addClass('is-open').removeClass('is-closed');
+
+      this.$triggers.attr('aria-expanded', 'true');
+      this.$element.attr('aria-hidden', 'false').trigger('opened.zf.offcanvas');
+
+      this.$content.addClass('is-open-' + this.position);
+
+      // If `contentScroll` is set to false, add class and disable scrolling on touch devices.
+      if (this.options.contentScroll === false) {
+        (0, _jquery2.default)('body').addClass('is-off-canvas-open').on('touchmove', this._stopScrolling);
+        this.$element.on('touchstart', this._recordScrollable);
+        this.$element.on('touchmove', this._stopScrollPropagation);
+      }
+
+      if (this.options.contentOverlay === true) {
+        this.$overlay.addClass('is-visible');
+      }
+
+      if (this.options.closeOnClick === true && this.options.contentOverlay === true) {
+        this.$overlay.addClass('is-closable');
+      }
+
+      if (this.options.autoFocus === true) {
+        this.$element.one((0, _foundationUtil3.transitionend)(this.$element), function () {
+          if (!_this.$element.hasClass('is-open')) {
+            return; // exit if prematurely closed
+          }
+          var canvasFocus = _this.$element.find('[data-autofocus]');
+          if (canvasFocus.length) {
+            canvasFocus.eq(0).focus();
+          } else {
+            _this.$element.find('a, button').eq(0).focus();
+          }
+        });
+      }
+
+      if (this.options.trapFocus === true) {
+        this.$content.attr('tabindex', '-1');
+        _foundationUtil.Keyboard.trapFocus(this.$element);
+      }
+
+      this._addContentClasses();
+    }
+
+    /**
+     * Closes the off-canvas menu.
+     * @function
+     * @param {Function} cb - optional cb to fire after closure.
+     * @fires OffCanvas#closed
+     */
+
+  }, {
+    key: 'close',
+    value: function close(cb) {
+      if (!this.$element.hasClass('is-open') || this.isRevealed) {
+        return;
+      }
+
+      var _this = this;
+
+      this.$element.removeClass('is-open');
+
+      this.$element.attr('aria-hidden', 'true')
+      /**
+       * Fires when the off-canvas menu opens.
+       * @event OffCanvas#closed
+       */
+      .trigger('closed.zf.offcanvas');
+
+      this.$content.removeClass('is-open-left is-open-top is-open-right is-open-bottom');
+
+      // If `contentScroll` is set to false, remove class and re-enable scrolling on touch devices.
+      if (this.options.contentScroll === false) {
+        (0, _jquery2.default)('body').removeClass('is-off-canvas-open').off('touchmove', this._stopScrolling);
+        this.$element.off('touchstart', this._recordScrollable);
+        this.$element.off('touchmove', this._stopScrollPropagation);
+      }
+
+      if (this.options.contentOverlay === true) {
+        this.$overlay.removeClass('is-visible');
+      }
+
+      if (this.options.closeOnClick === true && this.options.contentOverlay === true) {
+        this.$overlay.removeClass('is-closable');
+      }
+
+      this.$triggers.attr('aria-expanded', 'false');
+
+      if (this.options.trapFocus === true) {
+        this.$content.removeAttr('tabindex');
+        _foundationUtil.Keyboard.releaseFocus(this.$element);
+      }
+
+      // Listen to transitionEnd and add class when done.
+      this.$element.one((0, _foundationUtil3.transitionend)(this.$element), function (e) {
+        _this.$element.addClass('is-closed');
+        _this._removeContentClasses();
+      });
+    }
+
+    /**
+     * Toggles the off-canvas menu open or closed.
+     * @function
+     * @param {Object} event - Event object passed from listener.
+     * @param {jQuery} trigger - element that triggered the off-canvas to open.
+     */
+
+  }, {
+    key: 'toggle',
+    value: function toggle(event, trigger) {
+      if (this.$element.hasClass('is-open')) {
+        this.close(event, trigger);
+      } else {
+        this.open(event, trigger);
+      }
+    }
+
+    /**
+     * Handles keyboard input when detected. When the escape key is pressed, the off-canvas menu closes, and focus is restored to the element that opened the menu.
+     * @function
+     * @private
+     */
+
+  }, {
+    key: '_handleKeyboard',
+    value: function _handleKeyboard(e) {
+      var _this4 = this;
+
+      _foundationUtil.Keyboard.handleKey(e, 'OffCanvas', {
+        close: function close() {
+          _this4.close();
+          _this4.$lastTrigger.focus();
+          return true;
+        },
+        handled: function handled() {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      });
+    }
+
+    /**
+     * Destroys the offcanvas plugin.
+     * @function
+     */
+
+  }, {
+    key: '_destroy',
+    value: function _destroy() {
+      this.close();
+      this.$element.off('.zf.trigger .zf.offcanvas');
+      this.$overlay.off('.zf.offcanvas');
+    }
+  }]);
+
+  return OffCanvas;
+}(_foundation.Plugin);
+
+OffCanvas.defaults = {
+  /**
+   * Allow the user to click outside of the menu to close it.
+   * @option
+   * @type {boolean}
+   * @default true
+   */
+  closeOnClick: true,
+
+  /**
+   * Adds an overlay on top of `[data-off-canvas-content]`.
+   * @option
+   * @type {boolean}
+   * @default true
+   */
+  contentOverlay: true,
+
+  /**
+   * Target an off-canvas content container by ID that may be placed anywhere. If null the closest content container will be taken.
+   * @option
+   * @type {?string}
+   * @default null
+   */
+  contentId: null,
+
+  /**
+   * Define the off-canvas element is nested in an off-canvas content. This is required when using the contentId option for a nested element.
+   * @option
+   * @type {boolean}
+   * @default null
+   */
+  nested: null,
+
+  /**
+   * Enable/disable scrolling of the main content when an off canvas panel is open.
+   * @option
+   * @type {boolean}
+   * @default true
+   */
+  contentScroll: true,
+
+  /**
+   * Amount of time in ms the open and close transition requires. If none selected, pulls from body style.
+   * @option
+   * @type {number}
+   * @default null
+   */
+  transitionTime: null,
+
+  /**
+   * Type of transition for the offcanvas menu. Options are 'push', 'detached' or 'slide'.
+   * @option
+   * @type {string}
+   * @default push
+   */
+  transition: 'push',
+
+  /**
+   * Force the page to scroll to top or bottom on open.
+   * @option
+   * @type {?string}
+   * @default null
+   */
+  forceTo: null,
+
+  /**
+   * Allow the offcanvas to remain open for certain breakpoints.
+   * @option
+   * @type {boolean}
+   * @default false
+   */
+  isRevealed: false,
+
+  /**
+   * Breakpoint at which to reveal. JS will use a RegExp to target standard classes, if changing classnames, pass your class with the `revealClass` option.
+   * @option
+   * @type {?string}
+   * @default null
+   */
+  revealOn: null,
+
+  /**
+   * Force focus to the offcanvas on open. If true, will focus the opening trigger on close.
+   * @option
+   * @type {boolean}
+   * @default true
+   */
+  autoFocus: true,
+
+  /**
+   * Class used to force an offcanvas to remain open. Foundation defaults for this are `reveal-for-large` & `reveal-for-medium`.
+   * @option
+   * @type {string}
+   * @default reveal-for-
+   * @todo improve the regex testing for this.
+   */
+  revealClass: 'reveal-for-',
+
+  /**
+   * Triggers optional focus trapping when opening an offcanvas. Sets tabindex of [data-off-canvas-content] to -1 for accessibility purposes.
+   * @option
+   * @type {boolean}
+   * @default false
+   */
+  trapFocus: false
+};
+
+exports.OffCanvas = OffCanvas;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ResponsiveMenu = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _foundationUtil = __webpack_require__(4);
+
+var _foundationUtil2 = __webpack_require__(1);
+
+var _foundation = __webpack_require__(2);
+
+var _foundation2 = __webpack_require__(7);
+
+var _foundation3 = __webpack_require__(14);
+
+var _foundation4 = __webpack_require__(6);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MenuPlugins = {
+  dropdown: {
+    cssClass: 'dropdown',
+    plugin: _foundation2.DropdownMenu
+  },
+  drilldown: {
+    cssClass: 'drilldown',
+    plugin: _foundation3.Drilldown
+  },
+  accordion: {
+    cssClass: 'accordion-menu',
+    plugin: _foundation4.AccordionMenu
+  }
+};
+
+// import "foundation.util.triggers.js";
+
+
+/**
+ * ResponsiveMenu module.
+ * @module foundation.responsiveMenu
+ * @requires foundation.util.triggers
+ * @requires foundation.util.mediaQuery
+ */
+
+var ResponsiveMenu = function (_Plugin) {
+  _inherits(ResponsiveMenu, _Plugin);
+
+  function ResponsiveMenu() {
+    _classCallCheck(this, ResponsiveMenu);
+
+    return _possibleConstructorReturn(this, (ResponsiveMenu.__proto__ || Object.getPrototypeOf(ResponsiveMenu)).apply(this, arguments));
+  }
+
+  _createClass(ResponsiveMenu, [{
+    key: '_setup',
+
+    /**
+     * Creates a new instance of a responsive menu.
+     * @class
+     * @name ResponsiveMenu
+     * @fires ResponsiveMenu#init
+     * @param {jQuery} element - jQuery object to make into a dropdown menu.
+     * @param {Object} options - Overrides to the default plugin settings.
+     */
+    value: function _setup(element, options) {
+      this.$element = (0, _jquery2.default)(element);
+      this.rules = this.$element.data('responsive-menu');
+      this.currentMq = null;
+      this.currentPlugin = null;
+      this.className = 'ResponsiveMenu'; // ie9 back compat
+
+      this._init();
+      this._events();
+    }
+
+    /**
+     * Initializes the Menu by parsing the classes from the 'data-ResponsiveMenu' attribute on the element.
+     * @function
+     * @private
+     */
+
+  }, {
+    key: '_init',
+    value: function _init() {
+
+      _foundationUtil.MediaQuery._init();
+      // The first time an Interchange plugin is initialized, this.rules is converted from a string of "classes" to an object of rules
+      if (typeof this.rules === 'string') {
+        var rulesTree = {};
+
+        // Parse rules from "classes" pulled from data attribute
+        var rules = this.rules.split(' ');
+
+        // Iterate through every rule found
+        for (var i = 0; i < rules.length; i++) {
+          var rule = rules[i].split('-');
+          var ruleSize = rule.length > 1 ? rule[0] : 'small';
+          var rulePlugin = rule.length > 1 ? rule[1] : rule[0];
+
+          if (MenuPlugins[rulePlugin] !== null) {
+            rulesTree[ruleSize] = MenuPlugins[rulePlugin];
+          }
+        }
+
+        this.rules = rulesTree;
+      }
+
+      if (!_jquery2.default.isEmptyObject(this.rules)) {
+        this._checkMediaQueries();
+      }
+      // Add data-mutate since children may need it.
+      this.$element.attr('data-mutate', this.$element.attr('data-mutate') || (0, _foundationUtil2.GetYoDigits)(6, 'responsive-menu'));
+    }
+
+    /**
+     * Initializes events for the Menu.
+     * @function
+     * @private
+     */
+
+  }, {
+    key: '_events',
+    value: function _events() {
+      var _this = this;
+
+      (0, _jquery2.default)(window).on('changed.zf.mediaquery', function () {
+        _this._checkMediaQueries();
+      });
+      // $(window).on('resize.zf.ResponsiveMenu', function() {
+      //   _this._checkMediaQueries();
+      // });
+    }
+
+    /**
+     * Checks the current screen width against available media queries. If the media query has changed, and the plugin needed has changed, the plugins will swap out.
+     * @function
+     * @private
+     */
+
+  }, {
+    key: '_checkMediaQueries',
+    value: function _checkMediaQueries() {
+      var matchedMq,
+          _this = this;
+      // Iterate through each rule and find the last matching rule
+      _jquery2.default.each(this.rules, function (key) {
+        if (_foundationUtil.MediaQuery.atLeast(key)) {
+          matchedMq = key;
+        }
+      });
+
+      // No match? No dice
+      if (!matchedMq) return;
+
+      // Plugin already initialized? We good
+      if (this.currentPlugin instanceof this.rules[matchedMq].plugin) return;
+
+      // Remove existing plugin-specific CSS classes
+      _jquery2.default.each(MenuPlugins, function (key, value) {
+        _this.$element.removeClass(value.cssClass);
+      });
+
+      // Add the CSS class for the new plugin
+      this.$element.addClass(this.rules[matchedMq].cssClass);
+
+      // Create an instance of the new plugin
+      if (this.currentPlugin) this.currentPlugin.destroy();
+      this.currentPlugin = new this.rules[matchedMq].plugin(this.$element, {});
+    }
+
+    /**
+     * Destroys the instance of the current plugin on this element, as well as the window resize handler that switches the plugins out.
+     * @function
+     */
+
+  }, {
+    key: '_destroy',
+    value: function _destroy() {
+      this.currentPlugin.destroy();
+      (0, _jquery2.default)(window).off('.zf.ResponsiveMenu');
+    }
+  }]);
+
+  return ResponsiveMenu;
+}(_foundation.Plugin);
+
+ResponsiveMenu.defaults = {};
+
+exports.ResponsiveMenu = ResponsiveMenu;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Motion = exports.Move = undefined;
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _foundationUtil = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Motion module.
+ * @module foundation.motion
+ */
+
+var initClasses = ['mui-enter', 'mui-leave'];
+var activeClasses = ['mui-enter-active', 'mui-leave-active'];
+
+var Motion = {
+  animateIn: function animateIn(element, animation, cb) {
+    animate(true, element, animation, cb);
+  },
+
+  animateOut: function animateOut(element, animation, cb) {
+    animate(false, element, animation, cb);
+  }
+};
+
+function Move(duration, elem, fn) {
+  var anim,
+      prog,
+      start = null;
+  // console.log('called');
+
+  if (duration === 0) {
+    fn.apply(elem);
+    elem.trigger('finished.zf.animate', [elem]).triggerHandler('finished.zf.animate', [elem]);
+    return;
+  }
+
+  function move(ts) {
+    if (!start) start = ts;
+    // console.log(start, ts);
+    prog = ts - start;
+    fn.apply(elem);
+
+    if (prog < duration) {
+      anim = window.requestAnimationFrame(move, elem);
+    } else {
+      window.cancelAnimationFrame(anim);
+      elem.trigger('finished.zf.animate', [elem]).triggerHandler('finished.zf.animate', [elem]);
+    }
+  }
+  anim = window.requestAnimationFrame(move);
+}
+
+/**
+ * Animates an element in or out using a CSS transition class.
+ * @function
+ * @private
+ * @param {Boolean} isIn - Defines if the animation is in or out.
+ * @param {Object} element - jQuery or HTML object to animate.
+ * @param {String} animation - CSS class to use.
+ * @param {Function} cb - Callback to run when animation is finished.
+ */
+function animate(isIn, element, animation, cb) {
+  element = (0, _jquery2.default)(element).eq(0);
+
+  if (!element.length) return;
+
+  var initClass = isIn ? initClasses[0] : initClasses[1];
+  var activeClass = isIn ? activeClasses[0] : activeClasses[1];
+
+  // Set up the animation
+  reset();
+
+  element.addClass(animation).css('transition', 'none');
+
+  requestAnimationFrame(function () {
+    element.addClass(initClass);
+    if (isIn) element.show();
+  });
+
+  // Start the animation
+  requestAnimationFrame(function () {
+    element[0].offsetWidth;
+    element.css('transition', '').addClass(activeClass);
+  });
+
+  // Clean up the animation when it finishes
+  element.one((0, _foundationUtil.transitionend)(element), finish);
+
+  // Hides the element (for out animations), resets the element, and runs a callback
+  function finish() {
+    if (!isIn) element.hide();
+    reset();
+    if (cb) cb.apply(element);
+  }
+
+  // Resets transitions and removes motion-specific classes
+  function reset() {
+    element[0].style.transitionDuration = 0;
+    element.removeClass(initClass + ' ' + activeClass + ' ' + animation);
+  }
+}
+
+exports.Move = Move;
+exports.Motion = Motion;
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Touch = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //**************************************************
+//**Work inspired by multiple jquery swipe plugins**
+//**Done by Yohai Ararat ***************************
+//**************************************************
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Touch = {};
+
+var startPosX,
+    startPosY,
+    startTime,
+    elapsedTime,
+    isMoving = false;
+
+function onTouchEnd() {
+  //  alert(this);
+  this.removeEventListener('touchmove', onTouchMove);
+  this.removeEventListener('touchend', onTouchEnd);
+  isMoving = false;
+}
+
+function onTouchMove(e) {
+  if (_jquery2.default.spotSwipe.preventDefault) {
+    e.preventDefault();
+  }
+  if (isMoving) {
+    var x = e.touches[0].pageX;
+    var y = e.touches[0].pageY;
+    var dx = startPosX - x;
+    var dy = startPosY - y;
+    var dir;
+    elapsedTime = new Date().getTime() - startTime;
+    if (Math.abs(dx) >= _jquery2.default.spotSwipe.moveThreshold && elapsedTime <= _jquery2.default.spotSwipe.timeThreshold) {
+      dir = dx > 0 ? 'left' : 'right';
+    }
+    // else if(Math.abs(dy) >= $.spotSwipe.moveThreshold && elapsedTime <= $.spotSwipe.timeThreshold) {
+    //   dir = dy > 0 ? 'down' : 'up';
+    // }
+    if (dir) {
+      e.preventDefault();
+      onTouchEnd.call(this);
+      (0, _jquery2.default)(this).trigger('swipe', dir).trigger('swipe' + dir);
+    }
+  }
+}
+
+function onTouchStart(e) {
+  if (e.touches.length == 1) {
+    startPosX = e.touches[0].pageX;
+    startPosY = e.touches[0].pageY;
+    isMoving = true;
+    startTime = new Date().getTime();
+    this.addEventListener('touchmove', onTouchMove, false);
+    this.addEventListener('touchend', onTouchEnd, false);
+  }
+}
+
+function init() {
+  this.addEventListener && this.addEventListener('touchstart', onTouchStart, false);
+}
+
+function teardown() {
+  this.removeEventListener('touchstart', onTouchStart);
+}
+
+var SpotSwipe = function () {
+  function SpotSwipe($) {
+    _classCallCheck(this, SpotSwipe);
+
+    this.version = '1.0.0';
+    this.enabled = 'ontouchstart' in document.documentElement;
+    this.preventDefault = false;
+    this.moveThreshold = 75;
+    this.timeThreshold = 200;
+    this.$ = $;
+    this._init();
+  }
+
+  _createClass(SpotSwipe, [{
+    key: '_init',
+    value: function _init() {
+      var $ = this.$;
+      $.event.special.swipe = { setup: init };
+
+      $.each(['left', 'up', 'down', 'right'], function () {
+        $.event.special['swipe' + this] = { setup: function setup() {
+            $(this).on('swipe', $.noop);
+          } };
+      });
+    }
+  }]);
+
+  return SpotSwipe;
+}();
+
+/****************************************************
+ * As far as I can tell, both setupSpotSwipe and    *
+ * setupTouchHandler should be idempotent,          *
+ * because they directly replace functions &        *
+ * values, and do not add event handlers directly.  *
+ ****************************************************/
+
+Touch.setupSpotSwipe = function ($) {
+  $.spotSwipe = new SpotSwipe($);
+};
+
+/****************************************************
+ * Method for adding pseudo drag events to elements *
+ ***************************************************/
+Touch.setupTouchHandler = function ($) {
+  $.fn.addTouch = function () {
+    this.each(function (i, el) {
+      $(el).bind('touchstart touchmove touchend touchcancel', function (event) {
+        //we pass the original event object because the jQuery event
+        //object is normalized to w3c specs and does not provide the TouchList
+        handleTouch(event);
+      });
+    });
+
+    var handleTouch = function handleTouch(event) {
+      var touches = event.changedTouches,
+          first = touches[0],
+          eventTypes = {
+        touchstart: 'mousedown',
+        touchmove: 'mousemove',
+        touchend: 'mouseup'
+      },
+          type = eventTypes[event.type],
+          simulatedEvent;
+
+      if ('MouseEvent' in window && typeof window.MouseEvent === 'function') {
+        simulatedEvent = new window.MouseEvent(type, {
+          'bubbles': true,
+          'cancelable': true,
+          'screenX': first.screenX,
+          'screenY': first.screenY,
+          'clientX': first.clientX,
+          'clientY': first.clientY
+        });
+      } else {
+        simulatedEvent = document.createEvent('MouseEvent');
+        simulatedEvent.initMouseEvent(type, true, true, window, 1, first.screenX, first.screenY, first.clientX, first.clientY, false, false, false, false, 0 /*left*/, null);
+      }
+      first.target.dispatchEvent(simulatedEvent);
+    };
+  };
+};
+
+Touch.init = function ($) {
+  if (typeof $.spotSwipe === 'undefined') {
+    Touch.setupSpotSwipe($);
+    Touch.setupTouchHandler($);
+  }
+};
+
+exports.Touch = Touch;
 
 /***/ })
 /******/ ]);

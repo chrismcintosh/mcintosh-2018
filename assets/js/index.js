@@ -3,4 +3,6 @@ import whatInput from "what-input"
 
 import "./vendor/foundation"
 
-$(document).foundation()
+$(function() {
+  $(document).foundation()
+})

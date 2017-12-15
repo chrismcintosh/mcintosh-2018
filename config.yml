@@ -1,5 +1,5 @@
 # Your project's server will run on localhost:xxxx at this port
-PROXY: "chris.local"
+PROXY: "chris.test"
 PORT: 8000
 
 # Autoprefixer will make sure your CSS works with these browsers
@@ -16,7 +16,7 @@ UNCSS_OPTIONS:
 # Gulp will reference these paths when it copies files
 PATHS:
   # Path to dist folder
-  root: "./"
+  dist: "./"
   # Paths to static assets that aren't images, CSS, or JavaScript
   assets:
     - "assets/**/*"
@@ -25,5 +25,5 @@ PATHS:
   sass:
     - "node_modules/foundation-sites/scss"
   # Paths to JavaScript entry points for webpack to bundle modules
-  es6js:
+  entries:
     - "assets/js/index.js"

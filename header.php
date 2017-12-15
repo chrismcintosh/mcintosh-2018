@@ -16,7 +16,6 @@
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="profile" href="http://gmpg.org/xfn/11">
-
 	<?php wp_head(); ?>
 </head>
 
@@ -43,12 +42,12 @@
 		</div><!-- .site-branding -->
 
 		<nav id="site-navigation" class="main-navigation">
-			<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e( 'Primary Menu', 'mcintosh' ); ?></button>
+			<button class="mobile-menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e( 'Primary Menu', 'mcintosh' ); ?></button>
 			<?php
 				wp_nav_menu( array(
 					'theme_location' => 'menu-1',
 					'menu_id'        => 'primary-menu',
-					'items_wrap' => '<ul id="%1$s" class="%2$s menu" data-responsive-menu="accordion medium-dropdown">%3$s</ul>',
+					'items_wrap' => '<ul id="%1$s" class="%2$s menu dropdown vertical medium-horizontal" data-responsive-menu="accordion medium-dropdown">%3$s</ul>',
 					'walker'  => new Foundation_Walker()
 				) );
 			?>
