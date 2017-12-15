@@ -34,8 +34,17 @@ Underscores is distributed under the terms of the GNU GPL v2 or later.
 @import "content/captions";
 @import "content/galleries";
 
+/*--------------------------------------------------------------
+# Layout
+--------------------------------------------------------------*/
+@import "layout/header";
+
 .mobile-menu-toggle {
   @media screen and (min-width: 640px) {
     display: none;
   }
+}
+
+.fl-builder .entry-header {
+  display: none;
 }
