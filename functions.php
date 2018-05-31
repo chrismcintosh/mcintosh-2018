@@ -129,6 +129,11 @@ add_action( 'wp_enqueue_scripts', 'mcintosh_scripts' );
 require get_template_directory() . '/lib/inc/custom-header.php';
 
 /**
+ * Import Google Fonts
+ */
+require get_template_directory() . '/lib/inc/google-fonts.php';
+
+/**
  * Custom template tags for this theme.
  */
 require get_template_directory() . '/lib/inc/template-tags.php';
@@ -158,3 +163,23 @@ if ( class_exists( 'WooCommerce' ) ) {
 }
 
 include get_stylesheet_directory() . '/lib/inc/foundation-walker.php';
+
+function scratch_embed_container( $html ) {
+	return '<div class="responsive-embed widescreen">' . $html . '</div>';
+ }
+ add_filter( 'embed_oembed_html', 'scratch_embed_container', 10, 3 );
+ add_filter( 'video_embed_html', 'scratch_embed_container' );
+
+ function custom_excerpt_length( $length ) {
+	return 140;
+ }
+ add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
+
+ //* Include Flexible Content
+ include get_stylesheet_directory() . '/lib/acf/flexible-content.php';
+
+ //enqueues our external font awesome stylesheet
+function enqueue_our_required_stylesheets(){
+	wp_enqueue_script('font-awesome', 'https://use.fontawesome.com/releases/v5.0.8/js/all.js'); 
+}
+add_action('wp_enqueue_scripts','enqueue_our_required_stylesheets');

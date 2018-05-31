@@ -1,5 +1,5 @@
 # Your project's server will run on localhost:xxxx at this port
-PROXY: "chris.test"
+PROXY: "mio.test"
 PORT: 8000
 
 # Autoprefixer will make sure your CSS works with these browsers
@@ -24,6 +24,7 @@ PATHS:
   # Paths to Sass libraries, which can then be loaded with @import
   sass:
     - "node_modules/foundation-sites/scss"
+    - "node_modules/Plyr/scss"
   # Paths to JavaScript entry points for webpack to bundle modules
   entries:
     - "assets/js/index.js"

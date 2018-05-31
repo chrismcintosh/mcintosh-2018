@@ -1,7 +1,7 @@
-import $ from "jquery"
-import whatInput from "what-input"
+import $ from 'jquery'
+import whatInput from 'what-input'
 
-import "./vendor/foundation"
+import './vendor/foundation'
 
 $(function() {
   $(document).foundation()

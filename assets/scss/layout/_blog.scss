@@ -1,0 +1,10 @@
+.blog .site-main {
+  margin: 0 auto;
+  max-width: 92vw;
+  line-height: 1.7;
+
+  @media screen and (min-width: 480px) {
+    line-height: 2.375rem;
+    max-width: 960px;
+  }
+}

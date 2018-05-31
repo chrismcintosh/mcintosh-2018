@@ -9,7 +9,6 @@
 
 get_header(); ?>
 
-	<div id="primary" class="content-area">
 		<main id="main" class="site-main">
 
 			<section class="error-404 not-found">
@@ -54,7 +53,6 @@ get_header(); ?>
 			</section><!-- .error-404 -->
 
 		</main><!-- #main -->
-	</div><!-- #primary -->
 
 <?php
 get_footer();

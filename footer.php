@@ -31,6 +31,7 @@
 
 <?php wp_footer(); ?>
 
-
+</div><!-- end off canvas content -->
+</div> <!-- end off canvas wrapper-->
 </body>
 </html>

@@ -17,34 +17,58 @@ mcintosh-18 is based on Underscores https://underscores.me/, (C) 2012-2017 Autom
 Underscores is distributed under the terms of the GNU GPL v2 or later.
 */
 
-/*--------------------------------------------------------------
-# Defaults
---------------------------------------------------------------*/
-@import "vendor/foundation/foundation";
-@import "defaults/normalize-7-0-0";
-@import "defaults/typography";
-@import "defaults/accessibility";
+//--------------------------------------------------------------
+// Defaults
+//--------------------------------------------------------------
+@import 'vendor/foundation/foundation';
+@import 'defaults/normalize-7-0-0';
+@import 'defaults/variables';
+@import 'defaults/defaults';
+@import 'defaults/typography';
+@import 'defaults/accessibility';
 
-/*--------------------------------------------------------------
-# Content
---------------------------------------------------------------*/
-@import "content/posts-pages";
-@import "content/comments";
-@import "content/media";
-@import "content/captions";
-@import "content/galleries";
+//--------------------------------------------------------------
+// # Content
+//--------------------------------------------------------------
+@import 'content/posts-pages';
+@import 'content/comments';
+@import 'content/media';
+@import 'content/captions';
+@import 'content/galleries';
 
-/*--------------------------------------------------------------
-# Layout
---------------------------------------------------------------*/
-@import "layout/header";
+//--------------------------------------------------------------
+// Layout
+//--------------------------------------------------------------*/
+@import 'layout/content';
+@import 'layout/header';
+@import 'layout/blog';
 
-.mobile-menu-toggle {
-  @media screen and (min-width: 640px) {
-    display: none;
-  }
+@import 'components/text-image';
+
+.position-right {
+  width: 100%;
+  transform: translateX(100%);
 }
 
 .fl-builder .entry-header {
   display: none;
+}
+
+.home .entry-title {
+  display: none;
+}
+
+.single-post {
+  .site-main {
+    margin: 0 auto;
+    max-width: 960px;
+  }
+
+  article {
+    padding: 50px 0;
+  }
+}
+
+.dropdown.menu.medium-horizontal > li.is-dropdown-submenu-parent > a::after {
+  border-color: #444 transparent transparent;
 }

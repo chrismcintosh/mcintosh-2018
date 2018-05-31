@@ -20,8 +20,26 @@
 </head>
 
 <body <?php body_class(); ?>>
+<div class="off-canvas-wrapper">
+
+    <div class="off-canvas position-right" id="offCanvas" data-off-canvas>
+    <button class="close-button" aria-label="Close menu" type="button" data-toggle="offCanvas">
+	<span aria-hidden="true">&times;</span>
+	</button>
+	<?php
+				wp_nav_menu( array(
+					'theme_location' => 'menu-1',
+					'menu_id'        => 'mobile-menu',
+					'items_wrap' => '<ul id="%1$s" class="%2$s accordion" data-responsive-menu="accordion medium-accordion">%3$s</ul>',
+					'walker'  => new Foundation_Walker()
+				) );
+			?>
+    </div>
+
+        <div class="off-canvas-content" data-off-canvas-content>
+
 <div id="page" class="site">
-	<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'mcintosh' ); ?></a>
+	<a class="skip-link screen-reader-text" href="#main"><?php esc_html_e( 'Skip to content', 'mcintosh' ); ?></a>
 
 	<header class="site-header">
 		<div class="site-header__wrapper">
@@ -35,12 +53,13 @@
 				?>
 			</h1>
 		<nav id="site-navigation" class="main-navigation">
-			<button class="mobile-menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e( 'Primary Menu', 'mcintosh' ); ?></button>
+			<button class="mobile-menu-toggle" data-toggle="offCanvas"><i class="fas fa-align-right"></i> Menu</button>
+
 			<?php
 				wp_nav_menu( array(
 					'theme_location' => 'menu-1',
-					'menu_id'        => 'primary-menu',
-					'items_wrap' => '<ul id="%1$s" class="%2$s dropdown vertical medium-horizontal" data-responsive-menu="accordion medium-dropdown">%3$s</ul>',
+					'menu_id'        => 'desktop-menu',
+					'items_wrap' => '<ul id="%1$s" class="%2$s dropdown medium-horizontal" data-responsive-menu="dropdown medium-dropdown">%3$s</ul>',
 					'walker'  => new Foundation_Walker()
 				) );
 			?>
