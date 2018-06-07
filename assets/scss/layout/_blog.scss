@@ -1,4 +1,5 @@
 .blog .site-main {
+  background: none;
   margin: 0 auto;
   max-width: 92vw;
   line-height: 1.7;
@@ -7,4 +8,10 @@
     line-height: 2.375rem;
     max-width: 960px;
   }
+}
+
+.blog article {
+  background: #fff;
+  margin: 16px;
+  padding: 16px;
 }

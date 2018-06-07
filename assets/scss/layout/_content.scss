@@ -1,9 +1,50 @@
-.site-content {
+.site-main {
   background: #fff;
+
+  @media screen and (min-width: 640px) {
+    padding: 60px;
+  }
 }
 
+// Default Content
 .page-template-default .site-main,
 .page-template-flex-content .site-main {
   margin: 0 auto;
   max-width: 1400px;
+}
+
+.page-template-default.fl-builder .site-main,
+.page-template-flex-content .site-main {
+  max-width: none;
+}
+
+.page-template-default .site-content {
+  margin-top: 40px;
+}
+
+// Side-Bar Page Customizations
+
+.page-template-with-sidebar .site-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 1400px;
+
+  @media screen and (min-width: 640px) {
+    flex-direction: row;
+  }
+}
+
+.page-template-with-sidebar .site-main {
+  @media screen and (min-width: 640px) {
+    margin-top: 40px;
+    width: 60%;
+  }
+}
+
+.page-template-with-sidebar #secondary {
+  @media screen and (min-width: 640px) {
+    margin-top: 40px;
+  }
 }
