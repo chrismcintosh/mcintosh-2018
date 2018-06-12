@@ -55,3 +55,19 @@ body {
 .site-footer:after {
   clear: both;
 }
+
+.button {
+  background: rgba($main, 0.6);
+  border: 1px solid $secondary;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 200;
+  margin: 8px 0;
+  padding: 16px;
+  transition: 0.3s all ease-in-out;
+
+  &:hover {
+    background: rgba($secondary, 0.8);
+    color: #fff;
+  }
+}

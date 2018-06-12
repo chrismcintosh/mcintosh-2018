@@ -148,6 +148,8 @@ require get_template_directory() . '/lib/inc/template-functions.php';
  */
 require get_template_directory() . '/lib/inc/customizer.php';
 
+require get_template_directory() . '/lib/inc/gallery-mod.php';
+
 /**
  * Load Jetpack compatibility file.
  */
@@ -183,3 +185,12 @@ function enqueue_our_required_stylesheets(){
 	wp_enqueue_script('font-awesome', 'https://use.fontawesome.com/releases/v5.0.8/js/all.js'); 
 }
 add_action('wp_enqueue_scripts','enqueue_our_required_stylesheets');
+
+
+
+// add_action( 'wp_enqueue_scripts', 'add_lightbox_assets' );
+
+// function add_lightbox_assets() {
+//  	wp_enqueue_script( 'lightbox2', get_template_directory_uri() . '/assets/js/vendor/lightbox.js' );
+//  }
+

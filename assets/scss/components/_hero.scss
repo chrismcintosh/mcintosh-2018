@@ -1,0 +1,48 @@
+.hero {
+  background-size: cover !important;
+  display: flex;
+  height: 60vh;
+  justify-content: center;
+  position: relative;
+
+  @media screen and (min-width: 640px) {
+    height: 80vh;
+  }
+
+  &:before {
+    content: '';
+    display: block;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 0;
+    background-color: rgba(34, 34, 34, 0.8);
+  }
+
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+
+    align-items: center;
+    justify-content: center;
+  }
+
+  h2 {
+    color: #fff;
+    font-family: 'Montserrat';
+    font-weight: 700;
+    text-transform: uppercase;
+
+    @media screen and (min-width: 640px) {
+      text-align: center;
+    }
+  }
+
+  .button {
+    font-family: 'Roboto Slab';
+    margin-top: 24px;
+  }
+}

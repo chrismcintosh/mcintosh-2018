@@ -13,6 +13,7 @@
 
 .site-header a {
   color: #fff;
+  font-family: 'Roboto';
   margin: 0;
 
   &:hover {
@@ -110,7 +111,7 @@
 }
 
 .custom-logo {
-  max-width: 100px;
+  max-width: 150px;
   max-height: 300px;
   width: auto;
 
@@ -177,23 +178,25 @@
 }
 
 #desktop-menu .highlight {
-  background: #000000;
-  color: #fff;
+  background: $secondary;
   display: flex;
-  font-weight: 700;
   max-height: 50%;
   transition: all 0s ease-in-out;
   margin-left: 10px;
+  border: 2px solid $secondary;
+  transition: 0.3s ease-in-out;
 
   a {
+    font-family: 'Montserrat';
+    font-weight: 800;
     align-items: center;
     color: #fff;
+    text-transform: uppercase;
     display: flex;
     height: 100%;
   }
 
   &:hover {
-    // background: $gold;
-    // border-color: $gold;
+    background: none;
   }
 }

@@ -1,0 +1,84 @@
+.product-description {
+  h2 {
+    color: $secondary;
+    font-family: 'Montserrat';
+    font-size: 2.5rem;
+    font-weight: 800;
+    width: 100%;
+
+    @media screen and (min-width: 960px) {
+      font-size: 3rem;
+    }
+  }
+  h3 {
+    font-family: 'Montserrat';
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+
+  p {
+    font-family: 'Roboto Condensed';
+    font-size: 20px;
+  }
+
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 160px 2%;
+
+    @media screen and (min-width: 960px) {
+      flex-direction: row;
+      margin: 0 auto;
+      max-width: 96vw;
+      padding: 160px 0;
+    }
+    @media screen and (min-width: 1024px) {
+      max-width: 90vw;
+    }
+  }
+  .section {
+    display: flex;
+    flex-wrap: wrap;
+    @media screen and (min-width: 960px) {
+      max-width: 49%;
+    }
+  }
+
+  .square {
+    $square-size: 300px;
+    height: $square-size;
+    width: 100%;
+    object-fit: cover;
+
+    @media screen and (min-width: 960px) {
+      $square-size: 600px;
+      height: $square-size;
+      width: $square-size;
+    }
+
+    @media screen and (min-width: 1400px) {
+      height: 600px;
+      width: 100%;
+    }
+  }
+  .product-intro {
+    font-family: 'Roboto Slab';
+    font-size: 1.4rem;
+    font-weight: 300;
+    width: 100%;
+    margin-bottom: 60px;
+
+    @media screen and (min-width: 960px) {
+      font-size: 1.6rem;
+    }
+  }
+
+  .feature {
+    @media screen and (min-width: 1024px) {
+      padding: 0 20px 20px 0;
+      max-width: 49%;
+      width: 100%;
+    }
+  }
+}
